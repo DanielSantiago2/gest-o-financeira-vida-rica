@@ -1,0 +1,58 @@
+
+body {
+  max-width: 500px; /* Impede que o app fique largo demais */
+  margin: 0 auto;   /* Centraliza o app na tela */
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button:active {
+  transform: scale(0.98); /* Dá um efeito de clique */
+  background: #16a34a;    /* Escurece um pouco o verde */
+}
+.card {
+  background: #1e293b;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border-left: 4px solid #22c55e; /* Uma barrinha verde na lateral fica bem elegante */
+  display: flex;
+  justify-content: space-between; /* Se você quiser o nome de um lado e o valor do outro */
+}
+
+small {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.acoes {
+  display: flex;
+  gap: 5px;
+}
+
+.acoes button {
+  width: auto;
+  padding: 5px 10px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.btn-editar { background: #3b82f6; }
+.btn-apagar { background: #ef4444; }
