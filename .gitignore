@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+node_modules/
+bower_components/
+*.log
+
+build/
+dist/
+=======
+>>>>>>> 2bb8d5a
 # Logs
 logs
 *.log
@@ -67,3 +78,7 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+<<<<<<< HEAD
+=======
+>>>>>>> c21d30a (primeira versão do Vida Rica)
+>>>>>>> 2bb8d5a
