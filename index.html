@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Vida Rica</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+?<!--<body>
+
+  <h2>💰 Vida Rica</h2>
+
+  <input type="text" id="desc" placeholder="Descrição">
+  <input type="number" id="valor" placeholder="Valor">
+
+  <button onclick="salvar()">Adicionar</button>
+
+  <div id="lista"></div>
+
+  <h3>Total: R$ <span id="total">0</span></h3>
+
+  <script type="module" src="app.js"></script>
+  
+</body>
+</html>-->
+
+<body>
+  <h2>💰 Vida Rica</h2>
+
+  <div id="secao-login">
+    <input type="email" id="email" placeholder="E-mail">
+    <input type="password" id="senha" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <button onclick="cadastrar()" style="background: #64748b; margin-top: 5px;">Criar Conta</button>
+  </div>
+
+  <div id="secao-app" style="display: none;">
+    <p id="usuario-logado" style="text-align: center; font-size: 12px; color: #94a3b8;"></p>
+    <button onclick="sair()" style="background: #475569; padding: 5px; width: auto;">Sair</button>
+    
+    <hr style="margin: 20px 0; border-color: #1e293b;">
+
+    <select id="seletor-modo" onchange="mudarVisao()" style="margin-bottom: 10px; padding: 10px; border-radius: 10px; width: 100%;">
+        <option value="solteiro">🙋‍♂️ Modo Solteiro (Privado)</option>
+        <option value="casal">👩‍❤️‍👨 Modo Casal (Compartilhado)</option>
+    </select>
+
+    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+        <input type="text" id="desc" placeholder="Descrição" style="margin-bottom: 10px;">
+        <input type="number" id="valor" placeholder="Valor" style="margin-bottom: 10px;">
+
+        <div class="tipo-transacao" style="margin-bottom: 10px; color: white; display: flex; justify-content: space-around;">
+            <label><input type="radio" name="tipo" value="despesa" checked onchange="atualizarCategorias()"> 💸 Gasto</label>
+            <label><input type="radio" name="tipo" value="receita" onchange="atualizarCategorias()"> 💰 Ganho</label>
+        </div>
+
+        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <select id="categoria" style="padding: 10px; border-radius: 10px; flex-grow: 1;"></select>
+            <button onclick="gerenciarCategorias()" style="width: auto; background: #36a2eb;">+</button>
+        </div>
+
+        <button onclick="salvar()" style="width: 100%;">Adicionar Registro</button>
+
+        <div style="margin-top: 15px; border: 1px dashed #36a2eb; padding: 10px; border-radius: 10px; text-align: center;">
+            <label style="color: #36a2eb; cursor: pointer; font-size: 14px; display: block;">
+                📂 Importar Extrato (CSV ou PDF)
+                <input type="file" id="input-arquivo" accept=".csv, .pdf" style="display: none;" onchange="processarArquivo()">
+            </label>
+            <small style="color: #64748b; font-size: 10px;">Selecione o arquivo do seu banco</small>
+        </div>
+    </div>
+
+    <input type="month" id="filtro-mes" onchange="carregar()" style="width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 10px;">
+    <input type="text" id="busca" placeholder="🔍 Buscar..." oninput="filtrarGastos()" style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 10px;">
+
+    <div id="resumo-valores"></div>
+    <div style="max-width: 300px; margin: 0 auto 20px auto;"><canvas id="meuGrafico"></canvas></div>
+    
+    <div id="area-meta" style="margin-bottom: 20px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: white;">
+            <span>Meta Mensal</span>
+            <span id="valor-meta">R$ 0,00</span>
+        </div>
+        <div style="background: #333; height: 10px; border-radius: 5px; margin-top: 5px; overflow: hidden;">
+            <div id="barra-progresso" style="width: 0%; height: 100%; background: #4caf50; transition: 0.5s;"></div>
+        </div>
+        <button onclick="definirMeta()" style="margin-top: 10px; font-size: 10px; padding: 5px; width: auto;">Definir Meta</button>
+    </div>
+
+    <div id="lista"></div>
+    <h3 style="text-align: right;">Saldo: R$ <span id="total">0</span></h3>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module" src="app.js"></script>
+</body>
