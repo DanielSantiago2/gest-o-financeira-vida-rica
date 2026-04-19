@@ -46,60 +46,6 @@
         <option value="casal">👩‍❤️‍👨 Modo Casal (Compartilhado)</option>
     </select>
 
-<<<<<<< HEAD
-    <input type="text" id="desc" placeholder="Descrição">
-    <input type="number" id="valor" placeholder="Valor">
-    <select id="categoria" style="padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: 100%; margin-bottom: 10px;">
-        <option value="🏠 Casa">🏠 Casa</option>
-        <option value="🍔 Alimentação">🍔 Alimentação</option>
-        <option value="🏍️ Transporte">🏍️ Transporte</option>
-        <option value="🏐 Lazer/Vôlei">🏐 Lazer/Vôlei</option>
-        <option value="💡 Contas">💡 Contas</option>
-        <option value="🛠️ Ferramentas">🛠️ Ferramentas</option>
-        <option value="❓ Outros">❓ Outros</option>
-    </select>
-    <button onclick="salvar()">Adicionar</button>
-
-    <div style="margin-bottom: 15px;">
-        <label style="color: white; font-size: 14px;">Filtrar por Período:</label>
-        <input type="month" id="filtro-mes" onchange="carregar()" style="padding: 10px; border-radius: 10px; width: 100%; margin-top: 5px;">
-    </div>
-
-    <div style="margin-top: 10px;">
-        <input type="text" id="busca" placeholder="🔍 Buscar por nome..." oninput="filtrarGastos()" 
-             style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc;">
-    </div>
-
-    <div style="max-width: 300px; margin: 20px auto;">
-        <canvas id="meuGrafico"></canvas>
-    </div>
-
-    <div id="resumo-valores" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-    </div>
-
-    <div id="lista"></div>
-    <h3>Total: R$ <span id="total">0</span></h3>
-  </div>
-
-  <div id="area-meta" style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-    <span style="color: white; font-size: 14px;">Meta de Gastos (Mensal)</span>
-    <span id="valor-meta" style="color: #36a2eb; font-weight: bold;">R$ 0,00</span>
-  </div>
-  
-  <div style="background: #444; border-radius: 10px; height: 15px; width: 100%; overflow: hidden;">
-    <div id="barra-progresso" style="width: 0%; height: 100%; background: #4caf50; transition: 0.5s;"></div>
-  </div>
-  
-  <small id="aviso-meta" style="color: #aaa; margin-top: 5px; display: block;"></small>
-  
-  <button onclick="definirMeta()" style="margin-top: 10px; background: none; border: 1px solid #36a2eb; color: #36a2eb; border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 12px;">Definir Meta</button>
-</div>
-
-  <script type="module" src="app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-=======
     <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
         <input type="text" id="desc" placeholder="Descrição" style="margin-bottom: 10px;">
         <input type="number" id="valor" placeholder="Valor" style="margin-bottom: 10px;">
@@ -150,5 +96,4 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="module" src="app.js"></script>
->>>>>>> 2bb8d5a
 </body>
