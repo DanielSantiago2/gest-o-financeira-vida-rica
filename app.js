@@ -190,7 +190,8 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const ID_CASAL = "familia_santiago_2026";
 
-let meuGrafico = null; // Variável global para controlar o gráfico
+let meuGrafico = null;
+let transacoesAtuais = []; // Armazena os dados para o PDF
 
 // --- 2. CATEGORIAS ---
 const categoriasPadrao = {
@@ -214,8 +215,7 @@ window.atualizarCategorias = function() {
 window.renderizarGrafico = function(totalGanhos, totalGastos) {
     const ctx = document.getElementById('meuGrafico');
     if (!ctx) return;
-
-    if (meuGrafico) meuGrafico.destroy(); // Limpa o gráfico anterior para não sumir
+    if (meuGrafico) meuGrafico.destroy();
 
     meuGrafico = new Chart(ctx, {
         type: 'doughnut',
@@ -230,7 +230,6 @@ window.renderizarGrafico = function(totalGanhos, totalGastos) {
         options: { plugins: { legend: { labels: { color: 'white' } } } }
     });
 
-    // Alerta se estiver gastando mais do que ganha
     if (totalGastos > totalGanhos && totalGanhos > 0) {
         Swal.fire({
             title: 'Atenção!', text: 'Seus gastos superaram seus ganhos!', icon: 'warning',
@@ -263,18 +262,32 @@ window.atualizarInterfaceMeta = function(totalGastos = 0) {
 };
 
 // --- 4. OPERAÇÕES (CRUD) ---
+window.mudarVisao = function() {
+    window.carregar();
+};
+
 window.salvar = async function() {
     const desc = document.getElementById("desc").value;
     const valor = parseFloat(document.getElementById("valor").value);
     const tipo = document.querySelector('input[name="tipo"]:checked').value;
     const categoria = document.getElementById("categoria").value;
+    const modo = document.getElementById("seletor-modo").value;
 
     if (!desc || isNaN(valor)) return Swal.fire('Erro', 'Preencha os campos!', 'error');
 
     try {
-        await addDoc(collection(db, "transacoes"), { desc, valor, tipo, categoria, data: new Date(), userId: auth.currentUser.uid, grupoId: ID_CASAL });
+        await addDoc(collection(db, "transacoes"), { 
+            desc, 
+            valor, 
+            tipo, 
+            categoria, 
+            data: new Date(), 
+            userId: auth.currentUser.uid, 
+            grupoId: modo === "casal" ? ID_CASAL : "individual" 
+        });
         Swal.fire('Sucesso!', 'Salvo com sucesso.', 'success');
-        document.getElementById("desc").value = ""; document.getElementById("valor").value = "";
+        document.getElementById("desc").value = ""; 
+        document.getElementById("valor").value = "";
         window.carregar();
     } catch (e) { console.error(e); }
 };
@@ -282,37 +295,81 @@ window.salvar = async function() {
 window.carregar = async function() {
     if (!auth.currentUser) return;
     const lista = document.getElementById("lista");
-    lista.innerHTML = "Carregando...";
+    const modo = document.getElementById("seletor-modo").value;
+    lista.innerHTML = "<p style='text-align:center'>Carregando dados...</p>";
 
-    const q = query(collection(db, "transacoes"), where("userId", "==", auth.currentUser.uid), orderBy("data", "desc"));
-    const querySnapshot = await getDocs(q);
-    
-    let html = ""; let saldo = 0; let totalGastos = 0; let totalGanhos = 0;
+    try {
+        let q;
+        const ref = collection(db, "transacoes");
 
-    querySnapshot.forEach((docSnap) => {
-        const item = docSnap.data();
-        const id = docSnap.id;
-        const cor = item.tipo === 'despesa' ? '#ef4444' : '#4caf50';
-        
-        if (item.tipo === 'despesa') { saldo -= item.valor; totalGastos += item.valor; }
-        else { saldo += item.valor; totalGanhos += item.valor; }
+        if (modo === "casal") {
+            // Filtra pelo ID do Grupo (Juliana e Daniel veem o mesmo)
+            q = query(ref, where("grupoId", "==", ID_CASAL), orderBy("data", "desc"));
+        } else {
+            // Filtra apenas pelo que VOCÊ criou como individual
+            q = query(ref, where("userId", "==", auth.currentUser.uid), where("grupoId", "==", "individual"), orderBy("data", "desc"));
+        }
 
-        html += `
-            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; border-left: 4px solid ${cor};">
-                <div><strong>${item.desc}</strong><br><small>${item.categoria}</small></div>
-                <div style="text-align:right">
-                    <span style="color:${cor}">R$ ${item.valor.toFixed(2)}</span><br>
-                    <button onclick="excluirRegistro('${id}')" style="background:none; border:none; color:#ef4444; font-size:10px; cursor:pointer">Excluir</button>
-                </div>
-            </div>`;
-    });
+        const querySnapshot = await getDocs(q);
+        let html = ""; let saldo = 0; let totalGastos = 0; let totalGanhos = 0;
+        transacoesAtuais = []; // Limpa para o novo relatório
 
-    lista.innerHTML = html || "Nenhum registro.";
-    document.getElementById("total").innerText = saldo.toLocaleString('pt-br', {minimumFractionDigits: 2});
-    window.renderizarGrafico(totalGanhos, totalGastos);
-    window.atualizarInterfaceMeta(totalGastos);
+        querySnapshot.forEach((docSnap) => {
+            const item = docSnap.data();
+            const id = docSnap.id;
+            const cor = item.tipo === 'despesa' ? '#ef4444' : '#4caf50';
+            
+            transacoesAtuais.push(item); // Salva para o PDF
+
+            if (item.tipo === 'despesa') { saldo -= item.valor; totalGastos += item.valor; }
+            else { saldo += item.valor; totalGanhos += item.valor; }
+
+            html += `
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; border-left: 4px solid ${cor};">
+                    <div><strong>${item.desc}</strong><br><small>${item.categoria}</small></div>
+                    <div style="text-align:right">
+                        <span style="color:${cor}">R$ ${item.valor.toFixed(2)}</span><br>
+                        <button onclick="excluirRegistro('${id}')" style="background:none; border:none; color:#ef4444; font-size:10px; cursor:pointer">Excluir</button>
+                    </div>
+                </div>`;
+        });
+
+        lista.innerHTML = html || "Nenhum registro neste modo.";
+        document.getElementById("total").innerText = saldo.toLocaleString('pt-br', {minimumFractionDigits: 2});
+        window.renderizarGrafico(totalGanhos, totalGastos);
+        window.atualizarInterfaceMeta(totalGastos);
+
+    } catch (err) { console.error(err); }
 };
 
+// --- 5. RELATÓRIO PDF ---
+window.gerarRelatorioPDF = function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const modo = document.getElementById("seletor-modo").value;
+    
+    doc.setFontSize(18);
+    doc.text(`Relatório Vida Rica - Modo ${modo.toUpperCase()}`, 14, 20);
+    
+    const rows = transacoesAtuais.map(t => [
+        new Date(t.data.seconds * 1000).toLocaleDateString('pt-BR'),
+        t.desc,
+        t.categoria,
+        t.tipo === 'despesa' ? 'Gasto' : 'Ganho',
+        `R$ ${t.valor.toFixed(2)}`
+    ]);
+
+    doc.autoTable({
+        head: [['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor']],
+        body: rows,
+        startY: 30,
+        theme: 'grid'
+    });
+
+    doc.save(`Relatorio_VidaRica_${modo}.pdf`);
+};
+
+// --- RESTANTE DAS FUNÇÕES ---
 window.excluirRegistro = async function(id) {
     if ((await Swal.fire({ title: 'Excluir?', showCancelButton: true })).isConfirmed) {
         await deleteDoc(doc(db, "transacoes", id));
@@ -325,7 +382,6 @@ window.definirMeta = async function() {
     if (meta) { localStorage.setItem('meta_mensal', meta); window.carregar(); }
 };
 
-// --- 5. AUTENTICAÇÃO ---
 window.login = async () => {
     try { await signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("senha").value); }
     catch (e) { Swal.fire('Erro', 'Falha no login', 'error'); }
