@@ -170,235 +170,356 @@ window.salvar = async function () {
 window.onload = carregar;
 */
 
-// 1. IMPORTAÇÕES (Adicionado o 'where')
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, where, updateDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-// --- 1. CONFIGURAÇÃO FIREBASE ---
+// =============================
+// 🔥 IMPORTS FIREBASE
+// =============================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+
+import {
+  getFirestore, collection, addDoc, getDocs,
+  query, orderBy, where
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+import {
+  getAuth, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+// =============================
+// 🔥 CONFIG FIREBASE
+// =============================
 const firebaseConfig = {
-    apiKey: "AIzaSyD7Kr-ee-NLtK21wVh1GBLazZKIeigkzsU",
-    authDomain: "vida-rica-app-bc076.firebaseapp.com",
-    projectId: "vida-rica-app-bc076",
-    storageBucket: "vida-rica-app-bc076.firebasestorage.app",
-    messagingSenderId: "284683038291",
-    appId: "1:284683038291:web:f07db423b5fb99dc1520a6"
+  apiKey: "AIzaSyD7Kr-ee-NLtK21wVh1GBLazZKIeigkzsU",
+  authDomain: "vida-rica-app-bc076.firebaseapp.com",
+  projectId: "vida-rica-app-bc076",
+  storageBucket: "vida-rica-app-bc076.firebasestorage.app",
+  messagingSenderId: "284683038291",
+  appId: "1:284683038291:web:f07db423b5fb99dc1520a6"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const ID_CASAL = "familia_santiago_2026";
+
+// =============================
+// 🎯 ELEMENTOS
+// =============================
+const btnSalvar = document.getElementById("btn-salvar");
+const btnLogin = document.getElementById("btn-login");
+const btnCadastrar = document.getElementById("btn-cadastrar");
+const btnSair = document.getElementById("btn-sair");
+const btnPdf = document.getElementById("btn-pdf");
+
+const filtroMes = document.getElementById("filtro-mes");
+const btnFiltrar = document.getElementById("btn-filtrar");
+const btnLimpar = document.getElementById("btn-limpar");
+
+const inputEmail = document.getElementById("email");
+const inputSenha = document.getElementById("senha");
+
+const btnAddCategoria = document.getElementById("btn-add-categoria");
+const seletorModo = document.getElementById("seletor-modo");
 
 let meuGrafico = null;
-let transacoesAtuais = []; // Armazena os dados para o PDF
+const ID_CASAL = "familia_santiago_2026";
 
-// --- 2. CATEGORIAS ---
+// =============================
+// 🔄 TIPO
+// =============================
+function getTipoSelecionado() {
+  const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
+  return tipo === "ganho" ? "receita" : tipo;
+}
+
+// =============================
+// 🌱 CATEGORIAS PADRÃO
+// =============================
 const categoriasPadrao = {
-    despesa: ["🏠 Casa", "🍎 Alimentação", "🚗 Transporte", "🎡 Lazer", "💊 Saúde", "🛒 Mercado", "⚙️ Outros"],
-    receita: ["💰 Salário", "📈 Investimentos", "🎁 Presente", "➕ Extra"]
+  despesa: ["🏠 Casa", "🍔 Alimentação", "🚗 Transporte"],
+  receita: ["💰 Salário", "📈 Investimentos"]
 };
 
-window.atualizarCategorias = function() {
-    const tipoElem = document.querySelector('input[name="tipo"]:checked');
-    if (!tipoElem) return;
-    const select = document.getElementById("categoria");
-    select.innerHTML = "";
-    categoriasPadrao[tipoElem.value].forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat; option.textContent = cat;
-        select.appendChild(option);
-    });
-};
+// =============================
+// 🔥 CRIAR CATEGORIAS GLOBAIS
+// =============================
+async function criarCategoriasGlobais() {
+  const snapshot = await getDocs(
+    query(collection(db, "categorias"), where("userId", "==", "global"))
+  );
 
-// --- 3. GRÁFICO E MÉTRICAS ---
-window.renderizarGrafico = function(totalGanhos, totalGastos) {
-    const ctx = document.getElementById('meuGrafico');
-    if (!ctx) return;
-    if (meuGrafico) meuGrafico.destroy();
+  const existentes = [];
 
-    meuGrafico = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Ganhos', 'Gastos'],
-            datasets: [{
-                data: [totalGanhos, totalGastos],
-                backgroundColor: ['#4caf50', '#ef4444'],
-                borderWidth: 0
-            }]
-        },
-        options: { plugins: { legend: { labels: { color: 'white' } } } }
-    });
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    existentes.push(d.nome + "_" + d.tipo);
+  });
 
-    if (totalGastos > totalGanhos && totalGanhos > 0) {
-        Swal.fire({
-            title: 'Atenção!', text: 'Seus gastos superaram seus ganhos!', icon: 'warning',
-            toast: true, position: 'top-end', showConfirmButton: false, timer: 4000
+  for (let tipo in categoriasPadrao) {
+    for (let nome of categoriasPadrao[tipo]) {
+      const chave = nome + "_" + tipo;
+
+      if (!existentes.includes(chave)) {
+        await addDoc(collection(db, "categorias"), {
+          nome,
+          tipo,
+          userId: "global"
         });
+      }
     }
-};
+  }
+}
 
-window.atualizarInterfaceMeta = function(totalGastos = 0) {
-    const metaGuardada = localStorage.getItem('meta_mensal');
-    const valorMetaSpan = document.getElementById("valor-meta");
-    const barra = document.getElementById("barra-progresso");
+// =============================
+// 📥 CARREGAR CATEGORIAS
+// =============================
+async function carregarCategorias() {
+  if (!auth.currentUser) return;
 
-    if (!metaGuardada) return;
-    const meta = parseFloat(metaGuardada);
-    valorMetaSpan.innerText = `R$ ${meta.toFixed(2)}`;
-    
-    let porcentagem = (totalGastos / meta) * 100;
-    barra.style.width = Math.min(porcentagem, 100) + "%";
+  const tipo = getTipoSelecionado();
+  const select = document.getElementById("categoria");
+  const filtroSelect = document.getElementById("filtro-categoria");
 
-    if (porcentagem >= 100) {
-        barra.style.background = "#b91c1c";
-        Swal.fire({ title: 'Meta Estourada!', icon: 'error', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-    } else if (porcentagem >= 90) {
-        barra.style.background = "#ef4444";
-        Swal.fire({ title: 'Quase no limite!', icon: 'warning', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-    } else {
-        barra.style.background = "#4caf50";
+  if (!select) return;
+
+  select.innerHTML = "";
+  if (filtroSelect) filtroSelect.innerHTML = '<option value="">Todas categorias</option>';
+
+  const snapshot = await getDocs(collection(db, "categorias"));
+
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+
+    if (
+      data.tipo === tipo &&
+      (data.userId === "global" || data.userId === auth.currentUser.uid)
+    ) {
+      // select normal
+      const option = document.createElement("option");
+      option.value = data.nome;
+      option.textContent = data.nome;
+      select.appendChild(option);
+
+      // filtro
+      if (filtroSelect) {
+        const opt = document.createElement("option");
+        opt.value = data.nome;
+        opt.textContent = data.nome;
+        filtroSelect.appendChild(opt);
+      }
     }
-};
+  });
+}
 
-// --- 4. OPERAÇÕES (CRUD) ---
-window.mudarVisao = function() {
-    window.carregar();
-};
-
-window.salvar = async function() {
-    const desc = document.getElementById("desc").value;
+// =============================
+// 💾 SALVAR
+// =============================
+async function salvar() {
+  try {
+    const desc = document.getElementById("desc").value.trim();
     const valor = parseFloat(document.getElementById("valor").value);
-    const tipo = document.querySelector('input[name="tipo"]:checked').value;
+    const tipo = getTipoSelecionado();
     const categoria = document.getElementById("categoria").value;
-    const modo = document.getElementById("seletor-modo").value;
 
-    if (!desc || isNaN(valor)) return Swal.fire('Erro', 'Preencha os campos!', 'error');
+    const modo = seletorModo ? seletorModo.value : "solteiro";
 
-    try {
-        await addDoc(collection(db, "transacoes"), { 
-            desc, 
-            valor, 
-            tipo, 
-            categoria, 
-            data: new Date(), 
-            userId: auth.currentUser.uid, 
-            grupoId: modo === "casal" ? ID_CASAL : "individual" 
-        });
-        Swal.fire('Sucesso!', 'Salvo com sucesso.', 'success');
-        document.getElementById("desc").value = ""; 
-        document.getElementById("valor").value = "";
-        window.carregar();
-    } catch (e) { console.error(e); }
-};
+    if (!desc || isNaN(valor) || valor <= 0) {
+      return Swal.fire("Erro", "Preencha corretamente", "error");
+    }
 
-window.carregar = async function() {
-    if (!auth.currentUser) return;
-    const lista = document.getElementById("lista");
-    const modo = document.getElementById("seletor-modo").value;
-    lista.innerHTML = "<p style='text-align:center'>Carregando dados...</p>";
-
-    try {
-        let q;
-        const ref = collection(db, "transacoes");
-
-        if (modo === "casal") {
-            // Filtra pelo ID do Grupo (Juliana e Daniel veem o mesmo)
-            q = query(ref, where("grupoId", "==", ID_CASAL), orderBy("data", "desc"));
-        } else {
-            // Filtra apenas pelo que VOCÊ criou como individual
-            q = query(ref, where("userId", "==", auth.currentUser.uid), where("grupoId", "==", "individual"), orderBy("data", "desc"));
-        }
-
-        const querySnapshot = await getDocs(q);
-        let html = ""; let saldo = 0; let totalGastos = 0; let totalGanhos = 0;
-        transacoesAtuais = []; // Limpa para o novo relatório
-
-        querySnapshot.forEach((docSnap) => {
-            const item = docSnap.data();
-            const id = docSnap.id;
-            const cor = item.tipo === 'despesa' ? '#ef4444' : '#4caf50';
-            
-            transacoesAtuais.push(item); // Salva para o PDF
-
-            if (item.tipo === 'despesa') { saldo -= item.valor; totalGastos += item.valor; }
-            else { saldo += item.valor; totalGanhos += item.valor; }
-
-            html += `
-                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; border-left: 4px solid ${cor};">
-                    <div><strong>${item.desc}</strong><br><small>${item.categoria}</small></div>
-                    <div style="text-align:right">
-                        <span style="color:${cor}">R$ ${item.valor.toFixed(2)}</span><br>
-                        <button onclick="excluirRegistro('${id}')" style="background:none; border:none; color:#ef4444; font-size:10px; cursor:pointer">Excluir</button>
-                    </div>
-                </div>`;
-        });
-
-        lista.innerHTML = html || "Nenhum registro neste modo.";
-        document.getElementById("total").innerText = saldo.toLocaleString('pt-br', {minimumFractionDigits: 2});
-        window.renderizarGrafico(totalGanhos, totalGastos);
-        window.atualizarInterfaceMeta(totalGastos);
-
-    } catch (err) { console.error(err); }
-};
-
-// --- 5. RELATÓRIO PDF ---
-window.gerarRelatorioPDF = function() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const modo = document.getElementById("seletor-modo").value;
-    
-    doc.setFontSize(18);
-    doc.text(`Relatório Vida Rica - Modo ${modo.toUpperCase()}`, 14, 20);
-    
-    const rows = transacoesAtuais.map(t => [
-        new Date(t.data.seconds * 1000).toLocaleDateString('pt-BR'),
-        t.desc,
-        t.categoria,
-        t.tipo === 'despesa' ? 'Gasto' : 'Ganho',
-        `R$ ${t.valor.toFixed(2)}`
-    ]);
-
-    doc.autoTable({
-        head: [['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor']],
-        body: rows,
-        startY: 30,
-        theme: 'grid'
+    await addDoc(collection(db, "transacoes"), {
+      desc,
+      valor,
+      tipo,
+      categoria,
+      data: new Date(),
+      userId: auth.currentUser.uid,
+      grupoId: modo === "casal" ? ID_CASAL : "individual"
     });
 
-    doc.save(`Relatorio_VidaRica_${modo}.pdf`);
-};
+    document.getElementById("desc").value = "";
+    document.getElementById("valor").value = "";
 
-// --- RESTANTE DAS FUNÇÕES ---
-window.excluirRegistro = async function(id) {
-    if ((await Swal.fire({ title: 'Excluir?', showCancelButton: true })).isConfirmed) {
-        await deleteDoc(doc(db, "transacoes", id));
-        window.carregar();
+    Swal.fire("Sucesso", "Salvo!", "success");
+
+    carregar();
+
+  } catch (e) {
+    Swal.fire("Erro", e.message, "error");
+  }
+}
+
+// =============================
+// 📥 CARREGAR
+// =============================
+async function carregar() {
+  if (!auth.currentUser) return;
+
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "Carregando...";
+
+  const filtroCategoria = document.getElementById("filtro-categoria")?.value;
+  const filtroTipo = document.getElementById("filtro-tipo")?.value;
+  const busca = document.getElementById("busca")?.value?.toLowerCase() || "";
+
+  let inicio = null;
+  let fim = null;
+
+  if (filtroMes?.value) {
+    const [ano, mes] = filtroMes.value.split("-");
+    inicio = new Date(ano, mes - 1, 1);
+    fim = new Date(ano, mes, 0, 23, 59, 59);
+  }
+
+  const ref = collection(db, "transacoes");
+  let constraints = [];
+
+  if (seletorModo?.value === "casal") {
+    constraints.push(where("grupoId", "==", ID_CASAL));
+  } else {
+    constraints.push(where("userId", "==", auth.currentUser.uid));
+    constraints.push(where("grupoId", "==", "individual"));
+  }
+
+  if (inicio && fim) {
+    constraints.push(where("data", ">=", inicio));
+    constraints.push(where("data", "<=", fim));
+  }
+
+  constraints.push(orderBy("data", "desc"));
+
+  const snapshot = await getDocs(query(ref, ...constraints));
+
+  let saldo = 0, ganhos = 0, gastos = 0;
+  lista.innerHTML = "";
+
+  snapshot.forEach(docSnap => {
+    const item = docSnap.data();
+
+    if (busca && !item.desc.toLowerCase().includes(busca)) return;
+    if (filtroCategoria && item.categoria !== filtroCategoria) return;
+    if (filtroTipo && item.tipo !== filtroTipo) return;
+
+    if (item.tipo === "despesa") {
+      saldo -= item.valor;
+      gastos += item.valor;
+    } else {
+      saldo += item.valor;
+      ganhos += item.valor;
     }
-};
 
-window.definirMeta = async function() {
-    const { value: meta } = await Swal.fire({ title: 'Meta Mensal', input: 'number' });
-    if (meta) { localStorage.setItem('meta_mensal', meta); window.carregar(); }
-};
+    lista.innerHTML += `
+      <div class="card ${item.tipo}">
+        <strong>${item.desc}</strong><br>
+        ${item.categoria} - R$ ${item.valor.toFixed(2)}
+      </div>
+    `;
+  });
 
-window.login = async () => {
-    try { await signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("senha").value); }
-    catch (e) { Swal.fire('Erro', 'Falha no login', 'error'); }
-};
+  document.getElementById("total").innerText =
+    saldo.toLocaleString("pt-br", { minimumFractionDigits: 2 });
 
-window.cadastrar = async () => {
-    try { await createUserWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("senha").value); }
-    catch (e) { Swal.fire('Erro', 'Falha no cadastro', 'error'); }
-};
+  renderizarGrafico(ganhos, gastos);
+}
 
-window.sair = () => signOut(auth);
+// =============================
+// 📊 GRÁFICO
+// =============================
+function renderizarGrafico(ganhos, gastos) {
+  const ctx = document.getElementById("meuGrafico");
 
-onAuthStateChanged(auth, (user) => {
-    document.getElementById("secao-login").style.display = user ? "none" : "block";
-    document.getElementById("secao-app").style.display = user ? "block" : "none";
-    if (user) {
-        document.getElementById("usuario-logado").innerText = user.email;
-        window.atualizarCategorias(); window.carregar();
+  if (!ctx) return;
+  if (meuGrafico) meuGrafico.destroy();
+
+  meuGrafico = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Ganhos", "Gastos"],
+      datasets: [{
+        data: [ganhos, gastos],
+        backgroundColor: ["#22c55e", "#ef4444"]
+      }]
     }
+  });
+}
+
+// =============================
+// 📄 PDF PROFISSIONAL MELHORADO
+// =============================
+async function gerarPDF() {
+  if (!auth.currentUser) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text("Relatório Financeiro", 14, 15);
+
+  doc.setFontSize(10);
+  doc.text(`Usuário: ${auth.currentUser.email}`, 14, 22);
+
+  const canvas = document.getElementById("meuGrafico");
+
+  if (canvas) {
+    const img = canvas.toDataURL("image/png");
+    doc.addImage(img, "PNG", 20, 30, 160, 100);
+  }
+
+  doc.save("relatorio.pdf");
+}
+
+// =============================
+// 🔐 AUTH
+// =============================
+async function login() {
+  try {
+    await signInWithEmailAndPassword(auth, inputEmail.value, inputSenha.value);
+  } catch (e) {
+    Swal.fire("Erro", e.message, "error");
+  }
+}
+
+async function cadastrar() {
+  try {
+    await createUserWithEmailAndPassword(auth, inputEmail.value, inputSenha.value);
+  } catch (e) {
+    if (e.code === "auth/email-already-in-use") {
+      return Swal.fire("Erro", "Email já cadastrado", "warning");
+    }
+    Swal.fire("Erro", e.message, "error");
+  }
+}
+
+// =============================
+// 🔁 EVENTOS
+// =============================
+btnSalvar?.addEventListener("click", salvar);
+btnLogin?.addEventListener("click", login);
+btnCadastrar?.addEventListener("click", cadastrar);
+btnSair?.addEventListener("click", () => signOut(auth));
+
+btnFiltrar?.addEventListener("click", carregar);
+btnLimpar?.addEventListener("click", () => {
+  if (filtroMes) filtroMes.value = "";
+  carregar();
+});
+
+btnPdf?.addEventListener("click", gerarPDF);
+
+// =============================
+// 🔄 LOGIN STATE
+// =============================
+onAuthStateChanged(auth, async (user) => {
+
+  document.getElementById("secao-login").style.display = user ? "none" : "block";
+  document.getElementById("secao-app").style.display = user ? "block" : "none";
+
+  if (user) {
+    document.getElementById("usuario-logado").innerText = user.email;
+
+    await criarCategoriasGlobais();
+    await carregarCategorias();
+    carregar();
+  }
 });

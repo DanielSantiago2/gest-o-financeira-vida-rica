@@ -1,34 +1,30 @@
+/* =========================
+   RESET BÁSICO
+========================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
+/* =========================
+   BASE
+========================= */
 body {
-  max-width: 500px; /* Impede que o app fique largo demais */
-  margin: 0 auto;   /* Centraliza o app na tela */
+  max-width: 500px;
+  margin: 0 auto;
   font-family: Arial, sans-serif;
   background: #0f172a;
   color: white;
   padding: 20px;
 }
 
-
-input, button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-}
-
-button:active {
-  transform: scale(0.98); /* Dá um efeito de clique */
-  background: #16a34a;    /* Escurece um pouco o verde */
-}
-.card {
-  background: #1e293b;
-  padding: 15px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border-left: 4px solid #22c55e; /* Uma barrinha verde na lateral fica bem elegante */
-  display: flex;
-  justify-content: space-between; /* Se você quiser o nome de um lado e o valor do outro */
+/* =========================
+   TIPOGRAFIA
+========================= */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 small {
@@ -36,12 +32,73 @@ small {
   font-size: 12px;
 }
 
+/* =========================
+   INPUTS E BOTÕES
+========================= */
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+}
+
+button {
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   BOTÕES SECUNDÁRIOS
+========================= */
+.btn-secundario {
+  background: #475569;
+}
+
+.btn-perigo {
+  background: #ef4444;
+}
+
+.btn-azul {
+  background: #3b82f6;
+}
+
+/* =========================
+   CARD (transações)
+========================= */
 .card {
+  background: #1e293b;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+/* barra lateral por tipo */
+.card.receita {
+  border-left: 4px solid #22c55e;
+}
+
+.card.despesa {
+  border-left: 4px solid #ef4444;
+}
+
+/* =========================
+   AÇÕES (editar/excluir)
+========================= */
 .acoes {
   display: flex;
   gap: 5px;
@@ -50,9 +107,56 @@ small {
 .acoes button {
   width: auto;
   padding: 5px 10px;
-  margin: 0;
-  font-size: 14px;
+  font-size: 12px;
 }
 
-.btn-editar { background: #3b82f6; }
-.btn-apagar { background: #ef4444; }
+/* =========================
+   SEÇÕES
+========================= */
+.section {
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+/* =========================
+   RESUMO (saldo)
+========================= */
+.resumo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.resumo h1 {
+  font-size: 28px;
+}
+
+.resumo p {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+/* =========================
+   META
+========================= */
+.barra-container {
+  background: #333;
+  height: 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.barra {
+  height: 100%;
+  width: 0%;
+  background: #4caf50;
+  transition: 0.5s;
+}
+
+#meuGrafico {
+    max-width: 250px !important;
+    max-height: 250px !important;
+    margin: 20px auto;
+}
