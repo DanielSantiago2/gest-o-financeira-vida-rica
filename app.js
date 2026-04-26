@@ -1,176 +1,3 @@
-
-/*
-// 1. IMPORTAÇÕES (Usando CDN para funcionar sem npm)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, updateDoc, where } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-
-// 2. CONFIGURAÇÃO (Atualizada com a chave que você enviou agora)
-const firebaseConfig = {
-  apiKey: "AIzaSyD7Kr-ee-NLtK21wVh1GBLazZKIeigkzsU",
-  authDomain: "vida-rica-app-bc076.firebaseapp.com",
-  projectId: "vida-rica-app-bc076",
-  storageBucket: "vida-rica-app-bc076.firebasestorage.app",
-  messagingSenderId: "284683038291",
-  appId: "1:284683038291:web:f07db423b5fb99dc1520a6"
-};
-
-// 3. INICIALIZAÇÃO
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// FUNÇÃO CADASTRAR
-window.cadastrar = async function() {
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
-  try {
-    await createUserWithEmailAndPassword(auth, email, senha);
-    alert("Usuário criado com sucesso!");
-  } catch (e) {
-    alert("Erro ao cadastrar: " + e.message);
-  }
-};
-
-// FUNÇÃO LOGIN
-window.login = async function() {
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
-  try {
-    await signInWithEmailAndPassword(auth, email, senha);
-  } catch (e) {
-    alert("Erro no login: Verifique e-mail e senha.");
-  }
-};
-
-// FUNÇÃO SAIR
-window.sair = () => signOut(auth);
-
-// OBSERVADOR (Monitora se o usuário está logado ou não)
-onAuthStateChanged(auth, (user) => {
-  const secaoLogin = document.getElementById("secao-login");
-  const secaoApp = document.getElementById("secao-app");
-  const textoUsuario = document.getElementById("usuario-logado");
-
-  if (user) {
-    secaoLogin.style.display = "none";
-    secaoApp.style.display = "block";
-    textoUsuario.innerText = `Logado como: ${user.email}`;
-    carregar(); // Só carrega os dados se estiver logado
-  } else {
-    secaoLogin.style.display = "block";
-    secaoApp.style.display = "none";
-  }
-});
-
-// 4. FUNÇÃO CARREGAR (Definida separadamente para ser reutilizada)
-async function carregar() {
-  const lista = document.getElementById("lista");
-  const totalElement = document.getElementById("total");
-  let total = 0;
-  lista.innerHTML = "Carregando...";
-
-  try {
-    const q = query(collection(db, "gastos"), orderBy("data", "desc"));
-    const querySnapshot = await getDocs(q);
-    lista.innerHTML = "";
-
-    querySnapshot.forEach((res) => {
-      const g = res.data();
-      const id = res.id; // Pegamos o ID único do documento no Firebase
-      total += Number(g.valor);
-
-      const valorBR = Number(g.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-      
-      // Formata a data (dia/mês)
-      const dataFormatada = g.data?.toDate ? g.data.toDate().toLocaleDateString('pt-BR') : "";
-
-      const item = document.createElement("div");
-      item.className = "card";
-      item.innerHTML = `
-        <div>
-          <small>${dataFormatada}</small><br>
-          <strong>${g.desc}</strong> - ${valorBR}
-        </div>
-        <div class="acoes">
-          <button class="btn-editar" onclick="editar('${id}', '${g.desc}', ${g.valor})">✏️</button>
-          <button class="btn-apagar" onclick="apagar('${id}')">🗑️</button>
-        </div>
-      `;
-      lista.appendChild(item);
-    });
-
-    totalElement.innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-  } catch (e) {
-    console.error("Erro ao carregar:", e);
-  }
-}
-
-// FUNÇÃO APAGAR
-window.apagar = async function(id) {
-  if (confirm("Deseja realmente excluir este gasto?")) {
-    try {
-      await deleteDoc(doc(db, "gastos", id));
-      carregar(); // Atualiza a lista
-    } catch (e) {
-      alert("Erro ao apagar");
-    }
-  }
-};
-
-// FUNÇÃO EDITAR (Simples)
-window.editar = async function(id, descAntiga, valorAntigo) {
-  const novaDesc = prompt("Nova descrição:", descAntiga);
-  const novoValor = prompt("Novo valor:", valorAntigo);
-
-  if (novaDesc && novoValor) {
-    try {
-      const gastoRef = doc(db, "gastos", id);
-      await updateDoc(gastoRef, {
-        desc: novaDesc,
-        valor: Number(novoValor)
-      });
-      carregar();
-    } catch (e) {
-      alert("Erro ao editar");
-    }
-  }
-};
-
-// 5. FUNÇÃO SALVAR
-window.salvar = async function () {
-  const desc = document.getElementById("desc").value;
-  const valor = Number(document.getElementById("valor").value);
-
-  if (!desc || !valor) {
-    alert("Preencha a descrição e o valor!");
-    return;
-  }
-
-  try {
-        await addDoc(collection(db, "gastos"), {
-  desc: desc,
-  valor: valor,
-  data: new Date(),
-  userId: auth.currentUser.uid // Salva quem criou o gasto
-});
-    
-    document.getElementById("desc").value = "";
-    document.getElementById("valor").value = "";
-    
-    // Chama a função carregar que definimos acima
-    carregar();
-  } catch (e) {
-    console.error("Erro ao salvar dados: ", e);
-    alert("Erro ao salvar. Verifique o console.");
-  }
-};
-
-// 6. EXECUÇÃO AO ABRIR
-window.onload = carregar;
-*/
-
-
 // =============================
 // 🔥 IMPORTS FIREBASE
 // =============================
@@ -295,13 +122,11 @@ async function carregarCategorias() {
       data.tipo === tipo &&
       (data.userId === "global" || data.userId === auth.currentUser.uid)
     ) {
-      // select normal
       const option = document.createElement("option");
       option.value = data.nome;
       option.textContent = data.nome;
       select.appendChild(option);
 
-      // filtro
       if (filtroSelect) {
         const opt = document.createElement("option");
         opt.value = data.nome;
@@ -392,18 +217,28 @@ async function carregar() {
   const snapshot = await getDocs(query(ref, ...constraints));
 
   let saldo = 0, ganhos = 0, gastos = 0;
+  let categorias = {};
   lista.innerHTML = "";
 
   snapshot.forEach(docSnap => {
     const item = docSnap.data();
 
-    if (busca && !item.desc.toLowerCase().includes(busca)) return;
+    const desc = item.desc?.toLowerCase() || "";
+
+    if (busca && !desc.includes(busca)) return;
     if (filtroCategoria && item.categoria !== filtroCategoria) return;
     if (filtroTipo && item.tipo !== filtroTipo) return;
 
     if (item.tipo === "despesa") {
       saldo -= item.valor;
       gastos += item.valor;
+
+      // CORREÇÃO AQUI 👇
+      if (!categorias[item.categoria]) {
+        categorias[item.categoria] = 0;
+      }
+      categorias[item.categoria] += item.valor;
+
     } else {
       saldo += item.valor;
       ganhos += item.valor;
@@ -420,7 +255,11 @@ async function carregar() {
   document.getElementById("total").innerText =
     saldo.toLocaleString("pt-br", { minimumFractionDigits: 2 });
 
-  renderizarGrafico(ganhos, gastos);
+  renderizarGraficoPorCategoria(categorias);
+
+  if (lista.innerHTML === "") {
+    lista.innerHTML = "<p style='text-align:center;'>Nenhum registro encontrado</p>";
+  }
 }
 
 // =============================
@@ -444,29 +283,211 @@ function renderizarGrafico(ganhos, gastos) {
   });
 }
 
+function renderizarGraficoPorCategoria(dados) {
+  const ctx = document.getElementById("meuGrafico");
+
+  if (!ctx) return;
+  if (meuGrafico) meuGrafico.destroy();
+
+  const labels = Object.keys(dados);
+  const valores = Object.values(dados);
+
+  meuGrafico = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data: valores
+      }]
+    }
+  });
+}
+
+function limparTexto(texto) {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove acentos
+    .replace(/[^\x00-\x7F]/g, "");   // remove caracteres estranhos
+}
+
 // =============================
-// 📄 PDF PROFISSIONAL MELHORADO
+// 📄 PDF
 // =============================
 async function gerarPDF() {
   if (!auth.currentUser) return;
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-  doc.setFontSize(16);
-  doc.text("Relatório Financeiro", 14, 15);
+    let y = 20;
 
-  doc.setFontSize(10);
-  doc.text(`Usuário: ${auth.currentUser.email}`, 14, 22);
+    // =============================
+    // 🏦 CABEÇALHO
+    // =============================
+    doc.setFillColor(0, 0, 0);
+    doc.rect(0, 0, 210, 20, "F");
 
-  const canvas = document.getElementById("meuGrafico");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text("VIDA RICA - EXTRATO", 14, 13);
 
-  if (canvas) {
-    const img = canvas.toDataURL("image/png");
-    doc.addImage(img, "PNG", 20, 30, 160, 100);
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+
+    y = 30;
+
+    doc.text(`Usuário: ${auth.currentUser.email}`, 14, y);
+    y += 10;
+
+    // =============================
+    // 🔍 FILTROS
+    // =============================
+    const filtroCategoria = document.getElementById("filtro-categoria")?.value;
+    const filtroTipo = document.getElementById("filtro-tipo")?.value;
+
+    if (filtroMes?.value) {
+      doc.text(`Mês: ${filtroMes.value}`, 14, y);
+      y += 6;
+    }
+
+    if (filtroCategoria) {
+      doc.text(`Categoria: ${filtroCategoria}`, 14, y);
+      y += 6;
+    }
+
+    if (filtroTipo) {
+      doc.text(`Tipo: ${filtroTipo}`, 14, y);
+      y += 6;
+    }
+
+    y += 5;
+
+    // =============================
+    // 📊 BUSCAR DADOS
+    // =============================
+    const snapshot = await getDocs(collection(db, "transacoes"));
+
+    let totalGanhos = 0;
+    let totalGastos = 0;
+
+    // =============================
+    // 📋 CABEÇALHO TABELA
+    // =============================
+    doc.setFillColor(30, 41, 59); // azul escuro
+    
+    doc.rect(10, y, 190, 8, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+
+    doc.text("Data", 10, y + 5);
+    doc.text("Descrição", 30, y + 5);
+    doc.text("Categoria", 90, y + 5);
+    doc.text("Tipo", 140, y + 5);
+    doc.text("Valor", 200, y + 5, { align: "right" });
+
+    doc.setTextColor(0, 0, 0);
+    y += 12;
+
+    doc.setFont(undefined, "normal");
+
+    // =============================
+    // 📄 LINHAS
+    // =============================
+    snapshot.forEach(docSnap => {
+      const item = docSnap.data();
+
+      if (filtroCategoria && item.categoria !== filtroCategoria) return;
+      if (filtroTipo && item.tipo !== filtroTipo) return;
+
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+
+      let dataFormatada = "";
+      if (item.data?.seconds) {
+        dataFormatada = new Date(item.data.seconds * 1000).toLocaleDateString("pt-BR");
+      }
+
+      if (item.tipo === "despesa") {
+        totalGastos += item.valor;
+        doc.setTextColor(239, 68, 68);
+      } else {
+        totalGanhos += item.valor;
+        doc.setTextColor(34, 197, 94);
+      }
+
+      // Quebra automática de texto
+      const desc = doc.splitTextToSize(item.desc, 50);
+      const categoria = doc.splitTextToSize(item.categoria, 35);
+
+      // Data
+      doc.text(dataFormatada, 10, y);
+
+      // Descrição (quebra automática)
+      doc.text(desc, 30, y);
+
+      // Categoria (quebra automática)
+      doc.text(categoria, 90, y);
+
+      // Tipo
+      doc.text(item.tipo === "despesa" ? "Gasto" : "Ganho", 140, y);
+
+      // Valor alinhado à direita
+      doc.text(`R$ ${item.valor.toFixed(2)}`, 200, y, { align: "right" });
+
+      // Ajusta altura da linha dinamicamente
+      const alturaLinha = Math.max(desc.length, categoria.length) * 5;
+      y += alturaLinha;
+
+      
+      doc.setTextColor(0, 0, 0);
+
+      y += 6;
+    });
+
+    // =============================
+    // 📈 RESUMO
+    // =============================
+    y += 10;
+
+    doc.setFont(undefined, "bold");
+
+    doc.setTextColor(34, 197, 94);
+    doc.text(`Ganhos: R$ ${totalGanhos.toFixed(2)}`, 14, y);
+    y += 6;
+
+    doc.setTextColor(239, 68, 68);
+    doc.text(`Gastos: R$ ${totalGastos.toFixed(2)}`, 14, y);
+    y += 6;
+
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Saldo: R$ ${(totalGanhos - totalGastos).toFixed(2)}`, 14, y);
+
+    // =============================
+    // 📊 GRÁFICO
+    // =============================
+    const canvas = document.getElementById("meuGrafico");
+
+    if (canvas) {
+      const img = canvas.toDataURL("image/png", 1.0);
+      
+      doc.addPage();
+      doc.text("Resumo Gráfico", 14, 15);
+      doc.addImage(img, "PNG", 15, 20, 180, 90);
+    }
+
+    // =============================
+    // 💾 SALVAR
+    // =============================
+    doc.save("extrato-profissional.pdf");
+
+  } catch (e) {
+    console.error(e);
+    Swal.fire("Erro", e.message, "error");
   }
-
-  doc.save("relatorio.pdf");
 }
 
 // =============================
@@ -506,6 +527,15 @@ btnLimpar?.addEventListener("click", () => {
 });
 
 btnPdf?.addEventListener("click", gerarPDF);
+
+// 🔍 BUSCA
+const inputBusca = document.getElementById("busca");
+inputBusca?.addEventListener("input", carregar);
+
+// 🔄 TROCA TIPO
+document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+  radio.addEventListener("change", carregarCategorias);
+});
 
 // =============================
 // 🔄 LOGIN STATE
