@@ -1,162 +1,178 @@
-/* =========================
-   RESET BÁSICO
-========================= */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-/* =========================
-   BASE
-========================= */
-body {
-  max-width: 500px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
-  padding: 20px;
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background:#0f172a;
+  color:#fff;
+  max-width:520px;
+  margin:auto;
+  padding:20px;
 }
 
-/* =========================
-   TIPOGRAFIA
-========================= */
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
+/* TOPO */
+.topo{
+  text-align:center;
+  margin-bottom:20px;
 }
 
-small {
-  color: #94a3b8;
-  font-size: 12px;
+.topo h1{
+  font-size:28px;
+  margin-bottom:5px;
 }
 
-/* =========================
-   INPUTS E BOTÕES
-========================= */
-input, select, button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-  font-size: 14px;
+.topo p{
+  color:#94a3b8;
+  font-size:12px;
 }
 
-button {
-  background: #22c55e;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
+/* BOX */
+.box{
+  background:#1e293b;
+  padding:18px;
+  border-radius:18px;
+  margin-bottom:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
 }
 
-button:hover {
-  opacity: 0.9;
+.box h3,
+.box h2{
+  margin-bottom:12px;
 }
 
-button:active {
-  transform: scale(0.98);
+/* SALDO */
+.saldo-card{
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  padding:22px;
+  border-radius:20px;
+  margin-bottom:18px;
+  box-shadow:0 10px 25px rgba(37,99,235,.35);
 }
 
-/* =========================
-   BOTÕES SECUNDÁRIOS
-========================= */
-.btn-secundario {
-  background: #475569;
+.saldo-card small{
+  opacity:.9;
 }
 
-.btn-perigo {
-  background: #ef4444;
+.saldo-card h2{
+  font-size:30px;
+  margin-top:6px;
 }
 
-.btn-azul {
-  background: #3b82f6;
+/* INPUTS */
+input,
+select,
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:12px;
+  font-size:14px;
 }
 
-/* =========================
-   CARD (transações)
-========================= */
-.card {
-  background: #1e293b;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+input,
+select{
+  background:#0f172a;
+  color:#fff;
+  border:1px solid #334155;
 }
 
-/* barra lateral por tipo */
-.card.receita {
-  border-left: 4px solid #22c55e;
+/* BOTÕES */
+button{
+  background:#22c55e;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  transition:.2s;
 }
 
-.card.despesa {
-  border-left: 4px solid #ef4444;
+button:hover{
+  transform:translateY(-1px);
+  opacity:.95;
 }
 
-/* =========================
-   AÇÕES (editar/excluir)
-========================= */
-.acoes {
-  display: flex;
-  gap: 5px;
+.secundario{
+  background:#475569;
 }
 
-.acoes button {
-  width: auto;
-  padding: 5px 10px;
-  font-size: 12px;
+.danger{
+  background:#ef4444;
 }
 
-/* =========================
-   SEÇÕES
-========================= */
-.section {
-  background: rgba(255,255,255,0.05);
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+/* GRID */
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
 }
 
-/* =========================
-   RESUMO (saldo)
-========================= */
-.resumo {
-  text-align: center;
-  margin-bottom: 20px;
+/* CARD TRANSAÇÃO */
+.card{
+  background:#0f172a;
+  padding:14px;
+  border-radius:14px;
+  margin-top:12px;
+  border-left:5px solid #334155;
 }
 
-.resumo h1 {
-  font-size: 28px;
+.card.receita{
+  border-left-color:#22c55e;
 }
 
-.resumo p {
-  font-size: 14px;
-  color: #94a3b8;
+.card.despesa{
+  border-left-color:#ef4444;
 }
 
-/* =========================
-   META
-========================= */
-.barra-container {
-  background: #333;
-  height: 10px;
-  border-radius: 5px;
-  margin-top: 5px;
-  overflow: hidden;
+/* STATUS CONTAS */
+.vencido{
+  background:#7f1d1d !important;
 }
 
-.barra {
-  height: 100%;
-  width: 0%;
-  background: #4caf50;
-  transition: 0.5s;
+.vence-hoje{
+  background:#78350f !important;
 }
 
-#meuGrafico {
-    max-width: 250px !important;
-    max-height: 250px !important;
-    margin: 20px auto;
+.pago{
+  background:#052e16 !important;
+}
+
+/* AÇÕES */
+.acoes{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.acoes button{
+  margin-top:0;
+  padding:8px;
+  font-size:12px;
+}
+
+/* LISTA VAZIA */
+.vazio{
+  text-align:center;
+  color:#94a3b8;
+  padding:15px;
+}
+
+/* GRÁFICO */
+#meuGrafico{
+  max-height:260px;
+}
+
+/* MOBILE */
+@media(max-width:500px){
+  body{
+    padding:14px;
+  }
+
+  .grid2{
+    grid-template-columns:1fr;
+  }
 }

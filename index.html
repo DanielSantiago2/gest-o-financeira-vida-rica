@@ -1,108 +1,124 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Vida Rica</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nós Dois & Eu</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
 
-  <h2>💰 Vida Rica</h2>
+<header class="topo">
+  <h1>💙 Nós Dois & Eu</h1>
+  <p id="usuario-logado"></p>
+</header>
 
-  <!-- LOGIN -->
-  <div id="secao-login">
-    <input type="email" id="email" placeholder="E-mail">
-    <input type="password" id="senha" placeholder="Senha">
-    <button id="btn-login">Entrar</button>
-    <button id="btn-cadastrar" class="btn-secundario">Criar Conta</button>
+<!-- LOGIN -->
+<section id="secao-login" class="box">
+  <h2>Entrar</h2>
+
+  <input type="email" id="email" placeholder="Seu e-mail">
+  <input type="password" id="senha" placeholder="Sua senha">
+
+  <button id="btn-login">Entrar</button>
+  <button id="btn-cadastrar" class="secundario">Criar Conta</button>
+</section>
+
+<!-- APP -->
+<section id="secao-app" style="display:none;">
+
+  <!-- RESUMO -->
+  <div class="saldo-card">
+    <small>Saldo atual</small>
+    <h2>R$ <span id="total">0,00</span></h2>
   </div>
 
-  <!-- APP -->
-  <div id="secao-app" style="display:none">
+  <!-- AÇÕES -->
+  <div class="grid2">
+    <button id="btn-pdf">📄 Relatório</button>
+    <button id="btn-sair" class="danger">Sair</button>
+  </div>
 
-    <!-- USUÁRIO -->
-    <p id="usuario-logado" style="text-align:center; font-size:12px;"></p>
+  <!-- NOVA TRANSAÇÃO -->
+  <div class="box">
+    <h3>Nova Transação</h3>
 
-    <!-- RESUMO -->
-    <div class="resumo">
-      <h1>R$ <span id="total">0</span></h1>
-      <p>Saldo atual</p>
+    <input type="text" id="desc" placeholder="Descrição">
+    <input type="number" id="valor" placeholder="Valor">
+
+    <input type="date" id="vencimento">
+
+    <div class="grid2">
+      <label><input type="checkbox" id="fixo"> Fixo</label>
+      <label><input type="checkbox" id="parcelado"> Parcelado</label>
     </div>
 
-    <!-- AÇÕES -->
-    <div style="display:flex; gap:10px;">
-      <button id="btn-sair" class="btn-secundario">Sair</button>
-      <button id="btn-pdf" class="btn-perigo">📄 Relatório</button>
+    <input type="number" id="parcelas" placeholder="Quantidade parcelas">
+
+    <div class="grid2">
+      <label><input type="radio" name="tipo" value="despesa" checked> Gasto</label>
+      <label><input type="radio" name="tipo" value="receita"> Ganho</label>
     </div>
 
-    <!-- NOVA TRANSAÇÃO -->
-    <div class="section">
+    <select id="categoria"></select>
 
-      <input type="text" id="desc" placeholder="Descrição">
-      <input type="number" id="valor" placeholder="Valor">
+    <button id="btn-salvar">Adicionar</button>
+  </div>
 
-      <!-- TIPO -->
-      <div style="display:flex; justify-content:space-around; margin-top:10px;">
-        <label><input type="radio" name="tipo" value="despesa" checked> 💸 Gasto</label>
-        <label><input type="radio" name="tipo" value="receita"> 💰 Ganho</label>
-      </div>
+  <!-- FILTROS -->
+  <div class="box">
+    <h3>Filtros</h3>
 
-      <!-- CATEGORIA -->
-      <div style="display:flex; gap:5px;">
-        <select id="categoria"></select>
-        <button id="btn-add-categoria" class="btn-azul">+</button>
-      </div>
+    <input type="text" id="busca" placeholder="Buscar descrição">
 
-      <button id="btn-salvar">Adicionar</button>
+    <select id="filtro-categoria">
+      <option value="">Todas categorias</option>
+    </select>
+
+    <select id="filtro-tipo">
+      <option value="">Todos</option>
+      <option value="receita">Receitas</option>
+      <option value="despesa">Despesas</option>
+    </select>
+
+    <input type="month" id="filtro-mes">
+
+    <div class="grid2">
+      <button id="btn-filtrar">Filtrar</button>
+      <button id="btn-limpar" class="secundario">Limpar</button>
     </div>
+  </div>
 
-    <!-- FILTROS -->
-    <div class="section">
+  <!-- GRÁFICO -->
+  <div class="box">
+    <h3>Resumo</h3>
+    <canvas id="meuGrafico"></canvas>
+  </div>
 
-      <h3>🔎 Filtros</h3>
-
-      <input type="text" id="busca" placeholder="🔍 Buscar descrição...">
-
-      <select id="filtro-categoria">
-        <option value="">Todas categorias</option>
-      </select>
-
-      <select id="filtro-tipo">
-        <option value="">Todos</option>
-        <option value="receita">Receitas</option>
-        <option value="despesa">Despesas</option>
-      </select>
-
-      <div style="display:flex; gap:5px; margin-top:10px;">
-        <input type="month" id="filtro-mes">
-        <button id="btn-filtrar" class="btn-azul">Filtrar</button>
-        <button id="btn-limpar" class="btn-secundario">Limpar</button>
-      </div>
-
-    </div>
-
-    <!-- GRÁFICO -->
-    <div style="margin-top:20px;">
-      <canvas id="meuGrafico" height="200"></canvas>
-    </div>
-
-    <!-- LISTA -->
+  <!-- LISTA -->
+  <div class="box">
+    <h3>Transações</h3>
     <div id="lista"></div>
-
   </div>
 
-  <!-- LIBS -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- CONTAS -->
+  <div class="box">
+    <h3>Contas a Vencer</h3>
+    <div id="lista-contas"></div>
+  </div>
 
-  <!-- PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  
-  <!-- SEU JS -->
-  <script type="module" src="app.js"></script>
+</section>
+
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
