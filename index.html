@@ -17,6 +17,7 @@
 
 <body>
 
+<!-- TOPO -->
 <header class="topo">
   <h1>💙 Nós Dois & Eu</h1>
   <p id="usuario-logado"></p>
@@ -24,6 +25,7 @@
 
 <!-- LOGIN -->
 <section id="secao-login" class="box">
+
   <h2>Entrar</h2>
 
   <input type="email" id="email" placeholder="Seu e-mail">
@@ -33,15 +35,49 @@
   <button id="btn-cadastrar">Criar Conta</button>
   <button id="btn-google" class="btn-google">Entrar com Google</button>
   <button id="btn-recuperar">Esqueci minha senha</button>
+
 </section>
 
 <!-- APP -->
 <section id="secao-app" style="display:none;">
 
-  <!-- RESUMO -->
-  <div class="saldo-card">
-    <small>Saldo atual</small>
-    <h2>R$ <span id="total">0,00</span></h2>
+  <!-- MODO -->
+  <div class="box">
+
+    <h3>Modo do App</h3>
+
+    <div class="grid2">
+      <button id="btn-modo-solo">👤 Solteiro</button>
+      <button id="btn-modo-casal">💙 Casal</button>
+    </div>
+
+    <div id="painel-casal" style="margin-top:15px; display:none;">
+
+      <input type="email" id="email-parceiro" placeholder="E-mail do parceiro(a)">
+
+      <button id="btn-convidar">Convidar Parceiro</button>
+
+      <div class="status-casal">
+        <small id="status-casal">Nenhum parceiro conectado</small>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- SALDOS -->
+  <div class="grid2">
+
+    <div class="saldo-card">
+      <small>Saldo atual</small>
+      <h2>R$ <span id="total">0,00</span></h2>
+    </div>
+
+    <div class="saldo-card secundario-card">
+      <small>Meu saldo</small>
+      <h2>R$ <span id="meu-total">0,00</span></h2>
+    </div>
+
   </div>
 
   <!-- AÇÕES -->
@@ -52,6 +88,7 @@
 
   <!-- NOVA TRANSAÇÃO -->
   <div class="box">
+
     <h3>Nova Transação</h3>
 
     <input type="text" id="desc" placeholder="Descrição">
@@ -74,10 +111,12 @@
     <select id="categoria"></select>
 
     <button id="btn-salvar">Adicionar</button>
+
   </div>
 
   <!-- FILTROS -->
   <div class="box">
+
     <h3>Filtros</h3>
 
     <input type="text" id="busca" placeholder="Buscar descrição">
@@ -98,6 +137,7 @@
       <button id="btn-filtrar">Filtrar</button>
       <button id="btn-limpar" class="secundario">Limpar</button>
     </div>
+
   </div>
 
   <!-- GRÁFICO -->
