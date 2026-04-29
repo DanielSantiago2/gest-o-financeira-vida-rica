@@ -5,10 +5,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 
 import {
   getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
 import {
@@ -45,6 +47,8 @@ const db = getFirestore(app);
 // ================================
 const btnLogin = document.getElementById("btn-login");
 const btnCadastrar = document.getElementById("btn-cadastrar");
+const btnGoogle = document.getElementById("btn-google");
+const btnRecuperar = document.getElementById("btn-recuperar");
 const btnSair = document.getElementById("btn-sair");
 const btnSalvar = document.getElementById("btn-salvar");
 const btnPdf = document.getElementById("btn-pdf");
@@ -96,6 +100,23 @@ async function login() {
   }
 }
 
+async function loginGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
+
+    await signInWithPopup(auth, provider);
+
+    Swal.fire(
+      "Sucesso",
+      "Login com Google realizado!",
+      "success"
+    );
+
+  } catch (e) {
+    Swal.fire("Erro", e.message, "error");
+  }
+}
+
 async function cadastrar() {
   try {
     await createUserWithEmailAndPassword(
@@ -105,6 +126,27 @@ async function cadastrar() {
     );
 
     Swal.fire("Conta criada!", "", "success");
+  } catch (e) {
+    Swal.fire("Erro", e.message, "error");
+  }
+}
+
+async function recuperarSenha() {
+  const email = inputEmail.value.trim();
+
+  if (!email) {
+    return Swal.fire("Digite seu e-mail primeiro");
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+
+    Swal.fire(
+      "Enviado!",
+      "Link para redefinir senha enviado ao e-mail.",
+      "success"
+    );
+
   } catch (e) {
     Swal.fire("Erro", e.message, "error");
   }
@@ -361,17 +403,137 @@ function verificarAlertas() {
 // ================================
 // 📄 PDF
 // ================================
-function gerarPDF() {
-  const { jsPDF } = window.jspdf;
+async function gerarPDF() {
+  if (!auth.currentUser) return;
 
-  const docPdf = new jsPDF();
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-  docPdf.text("Nós Dois & Eu", 14, 15);
-  docPdf.text("Relatório Financeiro", 14, 25);
+    const snapshot = await getDocs(
+      query(
+        collection(db, "transacoes"),
+        where("userId", "==", auth.currentUser.uid),
+        orderBy("data", "desc")
+      )
+    );
 
-  docPdf.text("Saldo Atual: R$ " + total.innerText, 14, 40);
+    let receitas = 0;
+    let despesas = 0;
+    let linhas = [];
 
-  docPdf.save("relatorio.pdf");
+    function limparTexto(txt = "") {
+      return txt
+        .replace(/[^\w\sÀ-ÿ()-]/g, "") // remove emoji
+        .trim();
+    }
+
+    snapshot.forEach(docSnap => {
+      const item = docSnap.data();
+
+      const data = item.data?.seconds
+        ? new Date(item.data.seconds * 1000).toLocaleDateString("pt-BR")
+        : "-";
+
+      const descricao = limparTexto(item.desc);
+      const categoria = limparTexto(item.categoria);
+
+      if (item.tipo === "receita") {
+        receitas += item.valor;
+      } else {
+        despesas += item.valor;
+      }
+
+      linhas.push([
+        data,
+        descricao,
+        categoria,
+        item.tipo === "receita" ? "Receita" : "Despesa",
+        `R$ ${item.valor.toFixed(2)}`
+      ]);
+    });
+
+    const saldo = receitas - despesas;
+
+    // CABEÇALHO
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Nós Dois & Eu", 14, 18);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text("Relatório Financeiro Premium", 14, 26);
+
+    doc.setDrawColor(230);
+    doc.line(14, 30, 196, 30);
+
+    // RESUMO
+    doc.setFontSize(11);
+    doc.text(`Emitido em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 40);
+
+    doc.setTextColor(34, 197, 94);
+    doc.text(`Receitas: R$ ${receitas.toFixed(2)}`, 14, 52);
+
+    doc.setTextColor(239, 68, 68);
+    doc.text(`Despesas: R$ ${despesas.toFixed(2)}`, 14, 60);
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(`Saldo Atual: R$ ${saldo.toFixed(2)}`, 14, 74);
+
+    // TABELA
+    doc.autoTable({
+      startY: 85,
+      head: [["Data", "Descrição", "Categoria", "Tipo", "Valor"]],
+      body: linhas,
+      theme: "grid",
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        textColor: 40
+      },
+      headStyles: {
+        fillColor: [245, 245, 245],
+        textColor: 0,
+        fontStyle: "bold"
+      },
+      columnStyles: {
+        4: { halign: "right" }
+      },
+      alternateRowStyles: {
+        fillColor: [252, 252, 252]
+      }
+    });
+
+    let finalY = doc.lastAutoTable.finalY + 15;
+
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Resumo Final", 14, finalY);
+
+    finalY += 10;
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total de Transações: ${linhas.length}`, 14, finalY);
+
+    // RODAPÉ
+    const paginas = doc.internal.getNumberOfPages();
+
+    for (let i = 1; i <= paginas; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(120);
+      doc.text(`Página ${i} de ${paginas}`, 170, 290);
+    }
+
+    doc.save("relatorio-premium-nos-dois-e-eu.pdf");
+
+  } catch (e) {
+    console.error(e);
+    Swal.fire("Erro", e.message, "error");
+  }
 }
 
 // ================================
@@ -379,6 +541,8 @@ function gerarPDF() {
 // ================================
 btnLogin?.addEventListener("click", login);
 btnCadastrar?.addEventListener("click", cadastrar);
+btnGoogle?.addEventListener("click", loginGoogle);
+btnRecuperar?.addEventListener("click", recuperarSenha);
 btnSalvar?.addEventListener("click", salvar);
 btnPdf?.addEventListener("click", gerarPDF);
 

@@ -176,3 +176,10 @@ button:hover{
     grid-template-columns:1fr;
   }
 }
+
+.btn-google{
+  background:#ffffff;
+  color:#111;
+  font-weight:bold;
+  border:1px solid #ddd;
+}
