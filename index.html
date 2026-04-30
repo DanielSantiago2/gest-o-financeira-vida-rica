@@ -1,36 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+
+<!-- 🔤 Configuração básica da página -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Nós Dois & Eu</title>
 
+<!-- 🎨 Seu CSS -->
 <link rel="stylesheet" href="style.css">
 
+<!-- 📊 Gráficos -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- 🔔 Alertas bonitos -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- 📄 PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
 </head>
 
 <body>
 
-<!-- TOPO -->
+<!-- 🔝 TOPO DO APP -->
 <header class="topo">
   <h1>💙 Nós Dois & Eu</h1>
+  <!-- 👤 mostra usuário logado -->
   <p id="usuario-logado"></p>
 </header>
 
-<!-- LOGIN -->
+<!-- 🔐 LOGIN -->
 <section id="secao-login" class="box">
 
   <h2>Entrar</h2>
 
+  <!-- 📧 email -->
   <input type="email" id="email" placeholder="Seu e-mail">
+
+  <!-- 🔒 senha -->
   <input type="password" id="senha" placeholder="Sua senha">
 
+  <!-- 🔘 ações -->
   <button id="btn-login">Entrar</button>
   <button id="btn-cadastrar">Criar Conta</button>
   <button id="btn-google" class="btn-google">Entrar com Google</button>
@@ -38,10 +51,10 @@
 
 </section>
 
-<!-- APP -->
+<!-- 🚀 APP PRINCIPAL -->
 <section id="secao-app" style="display:none;">
 
-  <!-- MODO -->
+  <!-- ⚙️ MODO -->
   <div class="box">
 
     <h3>Modo do App</h3>
@@ -51,12 +64,18 @@
       <button id="btn-modo-casal">💙 Casal</button>
     </div>
 
+    <!-- 💙 ÁREA CASAL -->
     <div id="painel-casal" style="margin-top:15px; display:none;">
 
+      <!-- 📧 convidar parceiro -->
       <input type="email" id="email-parceiro" placeholder="E-mail do parceiro(a)">
-
       <button id="btn-convidar">Convidar Parceiro</button>
 
+      <!-- 🔑 entrar com código -->
+      <input type="text" id="codigo-grupo" placeholder="Código do grupo">
+      <button id="btn-entrar-grupo">Entrar no grupo</button>
+
+      <!-- 📊 status -->
       <div class="status-casal">
         <small id="status-casal">Nenhum parceiro conectado</small>
       </div>
@@ -65,72 +84,98 @@
 
   </div>
 
-  <!-- SALDOS -->
+  <!-- 💰 RESUMO FINANCEIRO -->
   <div class="grid2">
 
+    <!-- 💰 dinheiro disponível -->
     <div class="saldo-card">
-      <small>Saldo atual</small>
-      <h2>R$ <span id="total">0,00</span></h2>
+      <small>Tenho em dinheiro</small>
+      <h2>R$ <span id="dinheiro">0,00</span></h2>
     </div>
 
+    <!-- 📄 total de contas -->
     <div class="saldo-card secundario-card">
-      <small>Meu saldo</small>
-      <h2>R$ <span id="meu-total">0,00</span></h2>
+      <small>Contas a pagar</small>
+      <h2>R$ <span id="contas">0,00</span></h2>
     </div>
 
   </div>
 
-  <!-- AÇÕES -->
+  <!-- ⏳ falta pagar -->
+  <div class="saldo-card" style="margin-top:10px;">
+    <small>Falta pagar</small>
+    <h2>R$ <span id="falta">0,00</span></h2>
+  </div>
+
+  <!-- 🎯 AÇÕES -->
   <div class="grid2">
     <button id="btn-pdf">📄 Relatório</button>
     <button id="btn-sair" class="danger">Sair</button>
   </div>
 
-  <!-- NOVA TRANSAÇÃO -->
+  <!-- ➕ NOVA TRANSAÇÃO -->
   <div class="box">
-
+    
     <h3>Nova Transação</h3>
 
+    <!-- 📝 descrição -->
     <input type="text" id="desc" placeholder="Descrição">
+
+    <!-- 💰 valor -->
     <input type="number" id="valor" placeholder="Valor">
 
+    <!-- 📅 vencimento -->
     <input type="date" id="vencimento">
 
+    <!-- ⚙️ opções -->
     <div class="grid2">
       <label><input type="checkbox" id="fixo"> Fixo</label>
       <label><input type="checkbox" id="parcelado"> Parcelado</label>
     </div>
 
+    <!-- 📺 ASSINATURA (NOVO) -->
+    <label>
+      <input type="checkbox" id="assinatura">
+      É uma assinatura mensal
+    </label>
+
+    <!-- 🔢 parcelas -->
     <input type="number" id="parcelas" placeholder="Quantidade parcelas">
 
+    <!-- 🔁 tipo -->
     <div class="grid2">
       <label><input type="radio" name="tipo" value="despesa" checked> Gasto</label>
       <label><input type="radio" name="tipo" value="receita"> Ganho</label>
     </div>
 
+    <!-- 🏷️ categoria -->
     <select id="categoria"></select>
 
     <button id="btn-salvar">Adicionar</button>
 
   </div>
 
-  <!-- FILTROS -->
+  <!-- 🔍 FILTROS (ESSENCIAL PARA NÃO DAR ERRO) -->
   <div class="box">
 
     <h3>Filtros</h3>
 
+    <!-- 🔎 busca -->
     <input type="text" id="busca" placeholder="Buscar descrição">
 
+    <!-- 🏷️ categoria filtro -->
     <select id="filtro-categoria">
       <option value="">Todas categorias</option>
     </select>
 
+    <!-- 🔁 tipo -->
     <select id="filtro-tipo">
       <option value="">Todos</option>
       <option value="receita">Receitas</option>
       <option value="despesa">Despesas</option>
     </select>
 
+    <!-- 📅 mês -->
     <input type="month" id="filtro-mes">
 
     <div class="grid2">
@@ -140,26 +185,33 @@
 
   </div>
 
-  <!-- GRÁFICO -->
+  <!-- 📊 GRÁFICO -->
   <div class="box">
     <h3>Resumo</h3>
     <canvas id="meuGrafico"></canvas>
   </div>
 
-  <!-- LISTA -->
+  <!-- 📋 LISTA -->
   <div class="box">
     <h3>Transações</h3>
     <div id="lista"></div>
   </div>
 
-  <!-- CONTAS -->
+  <!-- 💳 CONTAS -->
   <div class="box">
     <h3>Contas a Vencer</h3>
     <div id="lista-contas"></div>
   </div>
 
+  <!-- 📺 LISTA DE ASSINATURAS -->
+  <div class="box">
+    <h3>📺 Assinaturas</h3>
+    <div id="lista-assinaturas"></div>
+  </div>
+
 </section>
 
+<!-- 🚀 JS PRINCIPAL -->
 <script type="module" src="app.js"></script>
 
 </body>
