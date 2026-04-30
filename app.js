@@ -211,7 +211,7 @@ async function convidarParceiro(){
     }
   );
 
-  const link = `${window.location.origin}?grupo=${grupo}`;
+  const link = `${window.location.origin}${window.location.pathname}?grupo=${grupo}`;
 
   const mensagem = `
 💙 Convite - Nós Dois & Eu
