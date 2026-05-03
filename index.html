@@ -1,219 +1,402 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 
-<!-- 🔤 Configuração básica da página -->
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- =====================================================
+  🔤 CONFIGURAÇÃO BÁSICA
+  ====================================================== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Nós Dois & Eu</title>
+  <!-- 🏷 Nome do App -->
+  <title>Nós Dois & Eu</title>
 
-<!-- 🎨 Seu CSS -->
-<link rel="stylesheet" href="style.css">
+  <!-- 🎨 CSS PRINCIPAL -->
+  <link rel="stylesheet" href="style.css">
 
-<!-- 📊 Gráficos -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- 📊 GRÁFICOS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- 🔔 Alertas bonitos -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- 🔔 ALERTAS BONITOS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- 📄 PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <!-- 📄 PDF FUTURO -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
 
-<body>
+<body class="dark">
 
-<!-- 🔝 TOPO DO APP -->
+<!-- =====================================================
+🔝 TOPO DO APP
+====================================================== -->
 <header class="topo">
+
+  <!-- 💙 Nome principal -->
   <h1>💙 Nós Dois & Eu</h1>
-  <!-- 👤 mostra usuário logado -->
-  <p id="usuario-logado"></p>
+
+  <!-- 👤 Usuário logado -->
+  <p id="usuario-logado">Visitante</p>
+
+  <!-- 💳 Plano atual -->
+  <small id="plano-usuario">GRÁTIS</small>
+
+  <!-- 🌙☀️ Alternar tema -->
+  <button id="btn-tema" class="mini-btn">
+    🌙 / ☀️
+  </button>
+
 </header>
 
-<!-- 🔐 LOGIN -->
+
+
+<!-- =====================================================
+🔐 ÁREA LOGIN
+====================================================== -->
 <section id="secao-login" class="box">
 
   <h2>Entrar</h2>
 
-  <!-- 📧 email -->
-  <input type="email" id="email" placeholder="Seu e-mail">
+  <!-- 📧 Email -->
+  <input
+    type="email"
+    id="email"
+    placeholder="Seu e-mail">
 
-  <!-- 🔒 senha -->
-  <input type="password" id="senha" placeholder="Sua senha">
+  <!-- 🔒 Senha -->
+  <input
+    type="password"
+    id="senha"
+    placeholder="Sua senha">
 
-  <!-- 🔘 ações -->
-  <button id="btn-login">Entrar</button>
-  <button id="btn-cadastrar">Criar Conta</button>
-  <button id="btn-google" class="btn-google">Entrar com Google</button>
-  <button id="btn-recuperar">Esqueci minha senha</button>
+  <!-- 👁 Mostrar senha (JS também reforça) -->
+  <button id="btn-ver-senha" class="secundario">
+    👁 Ver senha
+  </button>
+
+  <!-- 🔘 Entrar -->
+  <button id="btn-login">
+    Entrar
+  </button>
+
+  <!-- 🆕 Criar conta -->
+  <button id="btn-cadastrar">
+    Criar Conta
+  </button>
+
+  <!-- 🌐 Google -->
+  <button id="btn-google" class="google">
+    Entrar com Google
+  </button>
+
+  <!-- 📧 Recuperar -->
+  <button id="btn-recuperar" class="secundario">
+    Esqueci minha senha
+  </button>
 
 </section>
 
-<!-- 🚀 APP PRINCIPAL -->
+
+
+<!-- =====================================================
+🚀 APP PRINCIPAL
+====================================================== -->
 <section id="secao-app" style="display:none;">
 
-  <!-- ⚙️ MODO -->
-  <div class="box">
+<!-- =====================================================
+💳 RESUMO TOPO
+====================================================== -->
+<div class="grid2">
 
-    <h3>Modo do App</h3>
-
-    <div class="grid2">
-      <button id="btn-modo-solo">👤 Solteiro</button>
-      <button id="btn-modo-casal">💙 Casal</button>
-    </div>
-
-    <!-- 💙 ÁREA CASAL -->
-    <div id="painel-casal" style="margin-top:15px; display:none;">
-
-      <!-- 📧 convidar parceiro -->
-      <input type="email" id="email-parceiro" placeholder="E-mail do parceiro(a)">
-      <button id="btn-convidar">Convidar Parceiro</button>
-
-      <!-- 🔑 entrar com código -->
-      <input type="text" id="codigo-grupo" placeholder="Código do grupo">
-      <button id="btn-entrar-grupo">Entrar no grupo</button>
-
-      <!-- 📊 status -->
-      <div class="status-casal">
-        <small id="status-casal">Nenhum parceiro conectado</small>
-      </div>
-
-    </div>
-
+  <!-- 💰 Dinheiro -->
+  <div class="saldo-card">
+    <small>Tenho em dinheiro</small>
+    <h2>R$ <span id="dinheiro">0,00</span></h2>
   </div>
 
-  <!-- 💰 RESUMO FINANCEIRO -->
+  <!-- 📄 Contas -->
+  <div class="saldo-card secundario-card">
+    <small>Contas a pagar</small>
+    <h2>R$ <span id="contas">0,00</span></h2>
+  </div>
+
+</div>
+
+<!-- ⏳ Falta -->
+<div class="saldo-card destaque">
+  <small>Falta pagar</small>
+  <h2>R$ <span id="falta">0,00</span></h2>
+</div>
+
+
+
+<!-- =====================================================
+⚙️ AÇÕES RÁPIDAS
+====================================================== -->
+<div class="grid2">
+
+  <!-- 👑 Upgrade -->
+  <button id="btn-upgrade">
+    👑 Planos Premium
+  </button>
+
+  <!-- 📄 PDF -->
+  <button id="btn-pdf">
+    📄 Relatório
+  </button>
+
+</div>
+
+<div class="grid2">
+
+  <!-- 💙 Casal -->
+  <button id="btn-casal">
+    💙 Modo Casal
+  </button>
+
+  <!-- 🚪 Sair -->
+  <button id="btn-sair" class="danger">
+    Sair
+  </button>
+
+</div>
+
+
+
+<!-- =====================================================
+💌 ÁREA CASAL
+====================================================== -->
+<div class="box">
+
+  <h3>💙 Área do Casal</h3>
+
+  <!-- 📧 Email parceiro -->
+  <input
+    type="email"
+    id="email-parceiro"
+    placeholder="E-mail do parceiro(a)">
+
+  <!-- 📤 Convidar -->
+  <button id="btn-convidar">
+    Enviar Convite
+  </button>
+
+  <!-- 🔑 Código grupo -->
+  <input
+    type="text"
+    id="codigo-grupo"
+    placeholder="Código do grupo">
+
+  <!-- 🔗 Entrar -->
+  <button id="btn-entrar-grupo">
+    Entrar no Grupo
+  </button>
+
+  <!-- 📊 Status -->
+  <small id="status-casal">
+    Nenhum parceiro conectado
+  </small>
+
+</div>
+
+
+
+<!-- =====================================================
+➕ NOVA TRANSAÇÃO
+====================================================== -->
+<div class="box">
+
+  <h3>Nova Transação</h3>
+
+  <!-- 📝 Descrição -->
+  <input
+    type="text"
+    id="desc"
+    placeholder="Descrição">
+
+  <!-- 💰 Valor -->
+  <input
+    type="number"
+    id="valor"
+    placeholder="Valor">
+
+  <!-- 📅 Data -->
+  <input
+    type="date"
+    id="vencimento">
+
+  <!-- 💸 Tipo -->
   <div class="grid2">
 
-    <!-- 💰 dinheiro disponível -->
-    <div class="saldo-card">
-      <small>Tenho em dinheiro</small>
-      <h2>R$ <span id="dinheiro">0,00</span></h2>
-    </div>
-
-    <!-- 📄 total de contas -->
-    <div class="saldo-card secundario-card">
-      <small>Contas a pagar</small>
-      <h2>R$ <span id="contas">0,00</span></h2>
-    </div>
-
-  </div>
-
-  <!-- ⏳ falta pagar -->
-  <div class="saldo-card" style="margin-top:10px;">
-    <small>Falta pagar</small>
-    <h2>R$ <span id="falta">0,00</span></h2>
-  </div>
-
-  <!-- 🎯 AÇÕES -->
-  <div class="grid2">
-    <button id="btn-pdf">📄 Relatório</button>
-    <button id="btn-sair" class="danger">Sair</button>
-  </div>
-
-  <!-- ➕ NOVA TRANSAÇÃO -->
-  <div class="box">
-    
-    <h3>Nova Transação</h3>
-
-    <!-- 📝 descrição -->
-    <input type="text" id="desc" placeholder="Descrição">
-
-    <!-- 💰 valor -->
-    <input type="number" id="valor" placeholder="Valor">
-
-    <!-- 📅 vencimento -->
-    <input type="date" id="vencimento">
-
-    <!-- ⚙️ opções -->
-    <div class="grid2">
-      <label><input type="checkbox" id="fixo"> Fixo</label>
-      <label><input type="checkbox" id="parcelado"> Parcelado</label>
-    </div>
-
-    <!-- 📺 ASSINATURA (NOVO) -->
     <label>
-      <input type="checkbox" id="assinatura">
-      É uma assinatura mensal
+      <input
+        type="radio"
+        name="tipo"
+        value="despesa"
+        checked>
+      Gasto
     </label>
 
-    <!-- 🔢 parcelas -->
-    <input type="number" id="parcelas" placeholder="Quantidade parcelas">
+    <label>
+      <input
+        type="radio"
+        name="tipo"
+        value="receita">
+      Ganho
+    </label>
 
-    <!-- 🔁 tipo -->
-    <div class="grid2">
-      <label><input type="radio" name="tipo" value="despesa" checked> Gasto</label>
-      <label><input type="radio" name="tipo" value="receita"> Ganho</label>
+  </div>
+
+  <!-- 🏷 Categoria -->
+  <select id="categoria"></select>
+
+  <!-- ⚙️ Extras -->
+  <div class="grid2">
+
+    <label>
+      <input type="checkbox" id="fixo">
+      Fixo
+    </label>
+
+    <label>
+      <input type="checkbox" id="parcelado">
+      Parcelado
+    </label>
+
+  </div>
+
+  <!-- 📺 Assinatura -->
+  <label>
+    <input type="checkbox" id="assinatura">
+    Assinatura mensal
+  </label>
+
+  <!-- 🔢 Parcelas -->
+  <input
+    type="number"
+    id="parcelas"
+    placeholder="Qtd parcelas">
+
+  <!-- 💾 Salvar -->
+  <button id="btn-salvar">
+    Adicionar
+  </button>
+
+</div>
+
+
+
+<!-- =====================================================
+🎯 METAS FINANCEIRAS
+====================================================== -->
+<div class="box">
+
+  <h3>🎯 Minhas Metas</h3>
+
+  <!-- Tipo meta -->
+  <select id="tipo-meta">
+    <option>✈️ Viagem</option>
+    <option>🏠 Casa</option>
+    <option>🚗 Carro</option>
+    <option>💍 Casamento</option>
+    <option>👶 Filho</option>
+    <option>💰 Reserva</option>
+    <option>🎓 Estudos</option>
+    <option>📱 Celular</option>
+    <option>🖥 Notebook</option>
+    <option>Outro</option>
+  </select>
+
+  <!-- Valor meta -->
+  <input
+    type="number"
+    id="valor-meta"
+    placeholder="Valor da meta">
+
+  <!-- Salvar meta -->
+  <button id="btn-salvar-meta">
+    Salvar Meta
+  </button>
+
+  <!-- Lista metas -->
+  <div id="lista-metas"></div>
+
+</div>
+
+
+
+<!-- =====================================================
+🤖 ALERTAS / DICAS
+====================================================== -->
+<div class="box">
+
+  <h3>🤖 Inteligência Financeira</h3>
+
+  <div id="dicas-financeiras">
+
+    <div class="card">
+      Dicas aparecerão aqui...
     </div>
 
-    <!-- 🏷️ categoria -->
-    <select id="categoria"></select>
-
-    <button id="btn-salvar">Adicionar</button>
-
   </div>
 
-  <!-- 🔍 FILTROS (ESSENCIAL PARA NÃO DAR ERRO) -->
-  <div class="box">
+</div>
 
-    <h3>Filtros</h3>
 
-    <!-- 🔎 busca -->
-    <input type="text" id="busca" placeholder="Buscar descrição">
 
-    <!-- 🏷️ categoria filtro -->
-    <select id="filtro-categoria">
-      <option value="">Todas categorias</option>
-    </select>
+<!-- =====================================================
+📊 GRÁFICO
+====================================================== -->
+<div class="box">
 
-    <!-- 🔁 tipo -->
-    <select id="filtro-tipo">
-      <option value="">Todos</option>
-      <option value="receita">Receitas</option>
-      <option value="despesa">Despesas</option>
-    </select>
+  <h3>📊 Resumo Financeiro</h3>
 
-    <!-- 📅 mês -->
-    <input type="month" id="filtro-mes">
+  <canvas id="meuGrafico"></canvas>
 
-    <div class="grid2">
-      <button id="btn-filtrar">Filtrar</button>
-      <button id="btn-limpar" class="secundario">Limpar</button>
-    </div>
+</div>
 
-  </div>
 
-  <!-- 📊 GRÁFICO -->
-  <div class="box">
-    <h3>Resumo</h3>
-    <canvas id="meuGrafico"></canvas>
-  </div>
 
-  <!-- 📋 LISTA -->
-  <div class="box">
-    <h3>Transações</h3>
-    <div id="lista"></div>
-  </div>
+<!-- =====================================================
+📺 ASSINATURAS
+====================================================== -->
+<div class="box">
 
-  <!-- 💳 CONTAS -->
-  <div class="box">
-    <h3>Contas a Vencer</h3>
-    <div id="lista-contas"></div>
-  </div>
+  <h3>📺 Assinaturas</h3>
 
-  <!-- 📺 LISTA DE ASSINATURAS -->
-  <div class="box">
-    <h3>📺 Assinaturas</h3>
-    <!-- 💰 TOTAL DE ASSINATURAS -->
-    <p>Total mensal: <strong>R$ <span id="total-assinaturas">0,00</span></strong></p>
-    <div id="lista-assinaturas"></div>
-  </div>
+  <p>
+    Total mensal:
+    <strong>
+      R$ <span id="total-assinaturas">0,00</span>
+    </strong>
+  </p>
+
+  <div id="lista-assinaturas"></div>
+
+</div>
+
+
+
+<!-- =====================================================
+📋 TRANSAÇÕES
+====================================================== -->
+<div class="box">
+
+  <h3>📋 Transações</h3>
+
+  <div id="lista"></div>
+
+</div>
+
+
 
 </section>
 
-<!-- 🚀 JS PRINCIPAL -->
+
+
+<!-- =====================================================
+🚀 JAVASCRIPT PRINCIPAL
+====================================================== -->
 <script type="module" src="app.js"></script>
 
 </body>

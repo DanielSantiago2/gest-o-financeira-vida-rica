@@ -1,205 +1,539 @@
-/* RESET */
+/* =====================================================
+💙 NÓS DOIS & EU - STYLE.CSS DEFINITIVO
+Comentado como se eu mesmo tivesse criado
+Tema Claro / Escuro
+Responsivo
+Visual Premium
+===================================================== */
+
+
+/* =====================================================
+🔄 RESET GERAL
+===================================================== */
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
 }
 
-body{
-  font-family:Arial, Helvetica, sans-serif;
-  background:#0f172a;
-  color:#fff;
-  max-width:520px;
-  margin:auto;
-  padding:20px;
+
+/* =====================================================
+🎨 VARIÁVEIS GLOBAIS
+Tema escuro padrão
+===================================================== */
+:root{
+
+  --bg:#0f172a;
+  --card:#1e293b;
+  --card2:#111827;
+
+  --texto:#ffffff;
+  --texto2:#cbd5e1;
+
+  --borda:#334155;
+
+  --azul:#2563eb;
+  --azul2:#1d4ed8;
+
+  --verde:#22c55e;
+  --vermelho:#ef4444;
+  --roxo:#7c3aed;
+  --cinza:#475569;
+
+  --sombra:0 10px 25px rgba(0,0,0,.25);
+
 }
 
-/* TOPO */
+
+/* =====================================================
+☀️ TEMA CLARO
+JS troca class="light"
+===================================================== */
+body.light{
+
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --card2:#e2e8f0;
+
+  --texto:#0f172a;
+  --texto2:#334155;
+
+  --borda:#cbd5e1;
+
+  --sombra:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+
+/* =====================================================
+📱 BODY
+===================================================== */
+body{
+
+  font-family:Arial, Helvetica, sans-serif;
+
+  background:var(--bg);
+  color:var(--texto);
+
+  max-width:520px;
+  margin:auto;
+  padding:18px;
+
+  transition:.25s;
+
+}
+
+
+/* =====================================================
+🔝 TOPO
+===================================================== */
 .topo{
+
   text-align:center;
   margin-bottom:20px;
+
 }
 
 .topo h1{
+
   font-size:28px;
   margin-bottom:6px;
+
 }
 
 .topo p{
-  font-size:12px;
-  color:#94a3b8;
+
+  font-size:13px;
+  color:var(--texto2);
+  margin-bottom:5px;
+
 }
 
-/* BOX */
+.topo small{
+
+  display:block;
+  margin-bottom:10px;
+  font-size:12px;
+  color:#facc15;
+  font-weight:bold;
+
+}
+
+
+/* =====================================================
+📦 BOX PADRÃO
+===================================================== */
 .box{
-  background:#1e293b;
+
+  background:var(--card);
+
   padding:18px;
   border-radius:18px;
+
   margin-bottom:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+  box-shadow:var(--sombra);
+
+  border:1px solid var(--borda);
+
 }
 
 .box h2,
 .box h3{
+
   margin-bottom:12px;
+
 }
 
-/* INPUT */
+
+/* =====================================================
+⌨ INPUT / SELECT / BUTTON
+===================================================== */
 input,
 select,
 button{
+
   width:100%;
   padding:12px;
+
   margin-top:10px;
+
   border:none;
   border-radius:12px;
+
   font-size:14px;
+
 }
 
+
+/* =====================================================
+⌨ INPUTS
+===================================================== */
 input,
 select{
-  background:#0f172a;
-  color:#fff;
-  border:1px solid #334155;
+
+  background:var(--bg);
+  color:var(--texto);
+
+  border:1px solid var(--borda);
+
 }
 
-/* BOTÕES */
+
+/* =====================================================
+🔘 BOTÕES
+===================================================== */
 button{
-  background:#2563eb;
+
+  background:var(--azul);
   color:#fff;
+
   font-weight:bold;
   cursor:pointer;
-  transition:.2s;
+
+  transition:.20s;
+
 }
 
 button:hover{
-  transform:translateY(-1px);
+
+  transform:translateY(-2px);
   opacity:.95;
+
 }
 
+
+/* =====================================================
+🔘 VARIAÇÕES
+===================================================== */
 .secundario{
-  background:#475569;
+
+  background:var(--cinza);
+
 }
 
 .danger{
-  background:#ef4444;
+
+  background:var(--vermelho);
+
 }
 
-.btn-google{
-  background:#fff;
-  color:#111;
+.google{
+
+  background:#ffffff;
+  color:#111111;
+
 }
 
-/* GRID */
+.mini-btn{
+
+  width:auto;
+  padding:8px 14px;
+  font-size:12px;
+  margin-top:10px;
+
+}
+
+
+/* =====================================================
+📐 GRID 2 COLUNAS
+===================================================== */
 .grid2{
+
   display:grid;
   grid-template-columns:1fr 1fr;
+
   gap:10px;
   margin-bottom:15px;
+
 }
 
-/* SALDO */
+
+/* =====================================================
+💰 CARDS DE SALDO
+===================================================== */
 .saldo-card{
-  background:linear-gradient(135deg,#2563eb,#1d4ed8);
-  padding:22px;
+
+  background:linear-gradient(
+    135deg,
+    var(--azul),
+    var(--azul2)
+  );
+
+  padding:20px;
   border-radius:18px;
+
   box-shadow:0 10px 20px rgba(37,99,235,.35);
+
 }
 
 .saldo-card small{
-  opacity:.9;
+
+  opacity:.95;
+
 }
 
 .saldo-card h2{
-  font-size:28px;
+
   margin-top:6px;
+  font-size:28px;
+
 }
 
+
+/* Card Roxo */
 .secundario-card{
-  background:linear-gradient(135deg,#7c3aed,#6d28d9);
+
+  background:linear-gradient(
+    135deg,
+    var(--roxo),
+    #6d28d9
+  );
+
 }
 
-/* STATUS CASAL */
-.status-casal{
-  margin-top:12px;
-  padding:10px;
-  background:#0f172a;
-  border:1px solid #334155;
-  border-radius:12px;
+
+/* Destaque */
+.destaque{
+
+  margin-bottom:18px;
+
 }
 
-.status-casal small{
-  color:#cbd5e1;
-}
 
-/* CARD */
+/* =====================================================
+📋 CARDS INTERNOS
+===================================================== */
 .card{
-  background:#0f172a;
+
+  background:var(--card2);
+
   padding:14px;
   border-radius:14px;
+
   margin-top:12px;
-  border-left:5px solid #334155;
+
+  border-left:5px solid var(--borda);
+
 }
 
+
+/* Receita */
 .card.receita{
-  border-left-color:#22c55e;
+
+  border-left-color:var(--verde);
+
 }
 
+/* Despesa */
 .card.despesa{
-  border-left-color:#ef4444;
+
+  border-left-color:var(--vermelho);
+
 }
 
-/* STATUS */
-.vencido{
-  background:#7f1d1d !important;
-}
 
-.vence-hoje{
-  background:#78350f !important;
-}
-
-.pago{
-  background:#052e16 !important;
-}
-
-/* AÇÕES */
+/* =====================================================
+⚙ AÇÕES INTERNAS
+===================================================== */
 .acoes{
+
   display:flex;
   gap:8px;
   margin-top:10px;
+
 }
 
 .acoes button{
+
   margin-top:0;
   padding:8px;
   font-size:12px;
+
 }
 
-/* LISTA VAZIA */
-.vazio{
-  text-align:center;
-  color:#94a3b8;
-  padding:15px;
-}
 
-/* GRÁFICO */
+/* =====================================================
+📊 GRÁFICO
+===================================================== */
 #meuGrafico{
-  max-height:260px;
+
+  max-height:280px;
+
 }
 
-/* MOBILE */
+
+/* =====================================================
+🎯 METAS
+===================================================== */
+.progresso{
+
+  width:100%;
+  height:12px;
+
+  background:#1f2937;
+
+  border-radius:50px;
+
+  overflow:hidden;
+
+  margin-top:8px;
+
+}
+
+.progresso span{
+
+  display:block;
+  height:100%;
+
+  background:linear-gradient(
+    90deg,
+    #22c55e,
+    #16a34a
+  );
+
+}
+
+
+/* =====================================================
+💌 STATUS CASAL
+===================================================== */
+#status-casal{
+
+  display:block;
+  margin-top:10px;
+
+  color:var(--texto2);
+  font-size:13px;
+
+}
+
+
+/* =====================================================
+📺 ASSINATURAS
+===================================================== */
+#lista-assinaturas .card{
+
+  border-left-color:#f59e0b;
+
+}
+
+
+/* =====================================================
+🤖 DICAS
+===================================================== */
+#dicas-financeiras .card{
+
+  border-left-color:#06b6d4;
+
+}
+
+
+/* =====================================================
+📭 LISTA VAZIA
+===================================================== */
+.vazio{
+
+  text-align:center;
+  color:var(--texto2);
+
+  padding:15px;
+
+}
+
+
+/* =====================================================
+✨ ANIMAÇÃO SUAVE
+===================================================== */
+.box,
+.card,
+button{
+
+  transition:.25s;
+
+}
+
+
+/* =====================================================
+📱 MOBILE
+===================================================== */
 @media(max-width:500px){
 
   body{
+
     padding:14px;
+
   }
 
   .grid2{
+
     grid-template-columns:1fr;
+
   }
 
   .saldo-card h2{
+
     font-size:24px;
+
   }
 
 }
+
+
+/* =====================================================
+🖥 TELAS MAIORES
+===================================================== */
+@media(min-width:700px){
+
+  body{
+
+    max-width:620px;
+
+  }
+
+}
+
+
+/* =====================================================
+🌙 MODO ESCURO EXTRA
+===================================================== */
+body.dark{
+
+  background:
+  linear-gradient(
+    180deg,
+    #0f172a,
+    #020617
+  );
+
+}
+
+
+/* =====================================================
+☀️ MODO CLARO EXTRA
+===================================================== */
+body.light{
+
+  background:
+  linear-gradient(
+    180deg,
+    #f8fafc,
+    #e2e8f0
+  );
+
+}
+
+
+/* =====================================================
+💎 EFEITO PREMIUM
+===================================================== */
+button:active{
+
+  transform:scale(.98);
+
+}
+
+
+/* =====================================================
+📌 FIM
+===================================================== */

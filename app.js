@@ -1,14 +1,29 @@
-// ===================================
-// 🔥 IMPORTS FIREBASE
-// ===================================
+/* =========================================================
+💙 NÓS DOIS & EU - APP.JS DEFINITIVO
+Comentado como se eu mesmo tivesse criado
+✔ Firebase
+✔ Tema claro / escuro
+✔ Atualização automática
+✔ Gráfico
+✔ Metas
+✔ Alertas inteligentes
+✔ Premium / Trial
+✔ Casal
+✔ Compatível com coleções antigas
+========================================================= */
+
+
+/* =========================================================
+🔥 IMPORTS FIREBASE CDN
+========================================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged,
   signOut,
+  onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail
@@ -18,259 +33,427 @@ import {
   getFirestore,
   collection,
   addDoc,
-  getDocs,
-  query,
-  where,
-  orderBy,
+  setDoc,
+  getDoc,
   doc,
   updateDoc,
   deleteDoc,
-  setDoc,
-  getDoc
+  query,
+  where,
+  orderBy,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-// ===================================
-// CONFIG
-// ===================================
-const firebaseConfig = {
-  apiKey: "AIzaSyD7Kr-ee-NLtK21wVh1GBLazZKIeigkzsU",
-  authDomain: "vida-rica-app-bc076.firebaseapp.com",
-  projectId: "vida-rica-app-bc076",
-  storageBucket: "vida-rica-app-bc076.firebasestorage.app",
-  messagingSenderId: "284683038291",
-  appId: "1:284683038291:web:f07db423b5fb99dc1520a6"
-};
 
+/* =========================================================
+🔥 SUA CONFIG FIREBASE
+COLE SUA CONFIG REAL AQUI
+========================================================= */
+const firebaseConfig = {
+    apiKey: "AIzaSyD7Kr-ee-NLtK21wVh1GBLazZKIeigkzsU",
+    authDomain: "vida-rica-app-bc076.firebaseapp.com",
+    projectId: "vida-rica-app-bc076",
+    storageBucket: "vida-rica-app-bc076.firebasestorage.app",
+    messagingSenderId: "284683038291",
+    appId: "1:284683038291:web:f07db423b5fb99dc1520a6"
+  };
+
+
+/* =========================================================
+🚀 INICIAR FIREBASE
+========================================================= */
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ===================================
-// ELEMENTOS
-// ===================================
-const $ = id => document.getElementById(id);
 
-const btnLogin = $("btn-login");
-const btnCadastrar = $("btn-cadastrar");
-const btnGoogle = $("btn-google");
-const btnRecuperar = $("btn-recuperar");
-const btnSalvar = $("btn-salvar");
-const btnPdf = $("btn-pdf");
-const btnSair = $("btn-sair");
+/* =========================================================
+📌 FUNÇÃO CURTA
+========================================================= */
+const $ = (id)=>document.getElementById(id);
 
-const btnSolo = $("btn-modo-solo");
-const btnCasal = $("btn-modo-casal");
-const btnConvidar = $("btn-convidar");
-const btnEntrarGrupo = $("btn-entrar-grupo");
 
-let meuGrafico = null;
+/* =========================================================
+🌍 VARIÁVEIS GERAIS
+========================================================= */
 let grupoAtual = "";
-let modoAtual = "solo";
+let planoAtual = "gratis";
+let trialAtivo = false;
 
-// ===================================
-// CATEGORIAS
-// ===================================
+let grafico = null;
+let unsubscribe = null;
+
+
+/* =========================================================
+🏷 CATEGORIAS
+========================================================= */
 const categorias = {
-  despesa:["Casa","Mercado","Alimentação","Cartão","Transporte","Saúde","Lazer","Assinaturas","Outros"],
-  receita:["Salário","Freelance","Venda","Pix Recebido","Comissão","Investimento","Extra"]
+  despesa:[
+    "Casa","Mercado","Cartão","Transporte",
+    "Saúde","Lazer","Assinaturas","Outros"
+  ],
+  receita:[
+    "Salário","Freelance","PIX","Venda","Extra"
+  ]
 };
 
-function carregarCategorias(){
 
-  const tipoSelecionado =
-    document.querySelector('input[name="tipo"]:checked');
+/* =========================================================
+🎨 TROCAR TEMA
+========================================================= */
+function iniciarTema(){
 
-  const tipo = tipoSelecionado
-    ? tipoSelecionado.value
-    : "despesa";
+  const salvo = localStorage.getItem("tema") || "dark";
 
-  // 🔥 só mexe se existir
-  if($("categoria")){
-    $("categoria").innerHTML = "";
+  document.body.className = salvo;
 
-    categorias[tipo].forEach(cat=>{
-      $("categoria").innerHTML += `<option>${cat}</option>`;
-    });
-  }
-
-  // 🔥 só mexe se existir (EVITA ERRO)
-  if($("filtro-categoria")){
-    $("filtro-categoria").innerHTML =
-      `<option value="">Todas categorias</option>`;
-
-    categorias[tipo].forEach(cat=>{
-      $("filtro-categoria").innerHTML += `<option>${cat}</option>`;
-    });
-  }
 }
 
-// ===================================
-// PERFIL
-// ===================================
+function trocarTema(){
+
+  if(document.body.classList.contains("dark")){
+    document.body.className = "light";
+    localStorage.setItem("tema","light");
+  }else{
+    document.body.className = "dark";
+    localStorage.setItem("tema","dark");
+  }
+
+}
+
+
+/* =========================================================
+👁 VER SENHA
+========================================================= */
+function verSenha(){
+
+  if(!$("senha")) return;
+
+  $("senha").type =
+    $("senha").type === "password"
+    ? "text"
+    : "password";
+
+}
+
+
+/* =========================================================
+📂 CARREGAR CATEGORIAS
+========================================================= */
+function carregarCategorias(){
+
+  const tipo =
+    document.querySelector('input[name="tipo"]:checked')?.value
+    || "despesa";
+
+  $("categoria").innerHTML = "";
+
+  categorias[tipo].forEach(cat=>{
+    $("categoria").innerHTML += `<option>${cat}</option>`;
+  });
+
+}
+
+
+/* =========================================================
+🆕 CRIAR PERFIL
+Trial:
+7 dias individual
+30 casal
+========================================================= */
 async function criarPerfil(user){
+
   const ref = doc(db,"usuarios",user.uid);
   const snap = await getDoc(ref);
 
-  if(!snap.exists()){
-    await setDoc(ref,{
-      uid:user.uid,
-      email:user.email,
-      modo:"solo",
-      grupoId:user.uid
-    });
-  }
+  if(snap.exists()) return;
+
+  const hoje = new Date();
+
+  const fim = new Date();
+  fim.setDate(hoje.getDate() + 7);
+
+  await setDoc(ref,{
+    uid:user.uid,
+    email:user.email,
+
+    grupoId:user.uid,
+    modo:"solo",
+
+    plano:"gratis",
+
+    trialFim:fim.toISOString(),
+
+    parceiroEmail:"",
+
+    criadoEm:new Date()
+  });
+
 }
 
+
+/* =========================================================
+📥 CARREGAR PERFIL
+========================================================= */
 async function carregarPerfil(){
+
   const ref = doc(db,"usuarios",auth.currentUser.uid);
   const snap = await getDoc(ref);
+
   const dados = snap.data();
 
   grupoAtual = dados.grupoId;
-  modoAtual = dados.modo;
+  planoAtual = dados.plano || "gratis";
 
-  $("painel-casal").style.display =
-    modoAtual === "casal" ? "block":"none";
+  /* trial */
+  trialAtivo = false;
+
+  if(dados.trialFim){
+
+    if(new Date() <= new Date(dados.trialFim)){
+      trialAtivo = true;
+    }
+
+  }
+
+  atualizarPlanoTela(dados);
+
+}
+
+
+/* =========================================================
+💳 TEXTO PLANO
+========================================================= */
+function atualizarPlanoTela(dados){
+
+  let txt = planoAtual.toUpperCase();
+
+  if(trialAtivo){
+    txt += " + TESTE";
+  }
+
+  $("plano-usuario").innerText = txt;
 
   $("status-casal").innerText =
-    modoAtual === "casal"
-    ? `Modo casal ativo (Grupo: ${grupoAtual})`
-    : "Modo solteiro ativo";
+    dados.modo === "casal"
+    ? "💙 Grupo conectado"
+    : "👤 Modo individual";
+
 }
 
-// ===================================
-// LOGIN
-// ===================================
+
+/* =========================================================
+🔐 LOGIN
+========================================================= */
 async function login(){
-  await signInWithEmailAndPassword(
-    auth,$("email").value,$("senha").value
-  );
+
+  try{
+
+    await signInWithEmailAndPassword(
+      auth,
+      $("email").value,
+      $("senha").value
+    );
+
+  }catch{
+
+    Swal.fire("Erro","Login inválido","error");
+
+  }
+
 }
 
+
+/* =========================================================
+🆕 CADASTRAR
+========================================================= */
 async function cadastrar(){
-  await createUserWithEmailAndPassword(
-    auth,$("email").value,$("senha").value
-  );
+
+  try{
+
+    await createUserWithEmailAndPassword(
+      auth,
+      $("email").value,
+      $("senha").value
+    );
+
+    Swal.fire("Sucesso","Conta criada","success");
+
+  }catch{
+
+    Swal.fire("Erro","Não foi possível cadastrar","error");
+
+  }
+
 }
 
+
+/* =========================================================
+🌐 LOGIN GOOGLE
+========================================================= */
 async function loginGoogle(){
-  const provider = new GoogleAuthProvider();
-  await signInWithPopup(auth,provider);
+
+  try{
+
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth,provider);
+
+  }catch{
+
+    Swal.fire("Erro","Google falhou","error");
+
+  }
+
 }
 
+
+/* =========================================================
+📧 RECUPERAR SENHA
+========================================================= */
 async function recuperarSenha(){
-  await sendPasswordResetEmail(auth,$("email").value);
-  Swal.fire("Enviado!","","success");
+
+  try{
+
+    await sendPasswordResetEmail(
+      auth,
+      $("email").value
+    );
+
+    Swal.fire("Enviado","Confira seu e-mail","success");
+
+  }catch{
+
+    Swal.fire("Erro","Digite email válido","error");
+
+  }
+
 }
 
-// ===================================
-// MODOS
-// ===================================
-async function ativarSolo(){
-  await updateDoc(
-    doc(db,"usuarios",auth.currentUser.uid),
-    {
-      modo:"solo",
-      grupoId:auth.currentUser.uid
-    }
+
+/* =========================================================
+👑 PLANOS PREMIUM
+========================================================= */
+async function planos(){
+
+  const { value } = await Swal.fire({
+    title:"Escolha Plano",
+    input:"select",
+    inputOptions:{
+      gratis:"🆓 Grátis",
+      premium_individual:"👤 Premium Individual",
+      premium_casal:"💙 Premium Casal"
+    },
+    showCancelButton:true
+  });
+
+  if(!value) return;
+
+  const ref = doc(db,"usuarios",auth.currentUser.uid);
+
+  let trial = new Date();
+
+  if(value === "premium_casal"){
+    trial.setDate(trial.getDate()+30);
+  }else if(value === "premium_individual"){
+    trial.setDate(trial.getDate()+7);
+  }
+
+  await updateDoc(ref,{
+    plano:value,
+    trialFim:trial.toISOString()
+  });
+
+  Swal.fire(
+    "Plano atualizado",
+    "Pagamento será ativado futuramente.",
+    "success"
   );
 
-  carregarPerfil();
-  carregar();
 }
 
+
+/* =========================================================
+💙 MODO CASAL
+========================================================= */
 async function ativarCasal(){
+
   await updateDoc(
     doc(db,"usuarios",auth.currentUser.uid),
     { modo:"casal" }
   );
 
-  carregarPerfil();
+  Swal.fire(
+    "Modo casal ativado",
+    "",
+    "success"
+  );
+
 }
 
-// ===================================
-// 🔥 CONVIDAR (EMAIL + WHATSAPP)
-// ===================================
-async function convidarParceiro(){
 
-  const email = $("email-parceiro")?.value.trim();
+/* =========================================================
+💌 CONVIDAR
+========================================================= */
+async function convidar(){
 
-  if(!email){
-    Swal.fire("Digite um e-mail");
-    return;
-  }
+  const email = $("email-parceiro").value.trim();
 
-  const grupo = "GRUPO_" + Date.now();
+  if(!email) return;
+
+  const codigo = "GRUPO_" + Date.now();
 
   await updateDoc(
     doc(db,"usuarios",auth.currentUser.uid),
     {
-      grupoId:grupo,
+      grupoId:codigo,
       parceiroEmail:email,
       modo:"casal"
     }
   );
 
-  const link = `${window.location.origin}${window.location.pathname}?grupo=${grupo}`;
+  const msg =
+`💙 Convite Nós Dois & Eu
 
-  const mensagem = `
-💙 Convite - Nós Dois & Eu
+Código: ${codigo}
 
-Você foi convidado(a)!
-
-Código do grupo:
-${grupo}
-
-Acesse:
-${link}
-`;
+Entre no app e use o código.`;
 
   Swal.fire({
-    title:"Convite criado!",
+    title:"Convite criado",
     html:`
-      <button id="emailConvite">📧 Email</button>
-      <button id="zapConvite">📱 WhatsApp</button>
-      <br><br>
-      <small>${grupo}</small>
+      <button id="zapBtn">WhatsApp</button>
+      <button id="mailBtn">E-mail</button>
     `,
     showConfirmButton:false
   });
 
   setTimeout(()=>{
-    const btnEmail = document.getElementById("emailConvite");
-    const btnZap = document.getElementById("zapConvite");
 
-    if(btnEmail){
-      btnEmail.onclick = ()=>{
-        window.location.href =
-          `mailto:${email}?subject=Convite App Casal&body=${encodeURIComponent(mensagem)}`;
-      };
-    }
+    $("zapBtn").onclick = ()=>{
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(msg)}`,
+        "_blank"
+      );
+    };
 
-    if(btnZap){
-      btnZap.onclick = ()=>{
-        window.open(
-          `https://wa.me/?text=${encodeURIComponent(mensagem)}`,
-          "_blank"
-        );
-      };
-    }
-  },300);
+    $("mailBtn").onclick = ()=>{
+      window.location.href =
+      `mailto:${email}?subject=Convite&body=${encodeURIComponent(msg)}`;
+    };
 
-  carregarPerfil();
+  },200);
+
 }
 
-// ===================================
-// 🔥 ENTRAR NO GRUPO
-// ===================================
+
+/* =========================================================
+🔗 ENTRAR GRUPO
+========================================================= */
 async function entrarGrupo(){
 
-  const codigo = $("codigo-grupo")?.value.trim();
+  const codigo = $("codigo-grupo").value.trim();
 
-  if(!codigo){
-    Swal.fire("Digite o código");
-    return;
-  }
+  if(!codigo) return;
 
   await updateDoc(
     doc(db,"usuarios",auth.currentUser.uid),
@@ -280,281 +463,330 @@ async function entrarGrupo(){
     }
   );
 
-  Swal.fire("Conectado com sucesso!","","success");
+  Swal.fire("Conectado","","success");
 
-  carregarPerfil();
-  carregar();
 }
 
-// ===================================
-// SALVAR
-// ===================================
+
+/* =========================================================
+💾 SALVAR TRANSAÇÃO
+========================================================= */
 async function salvar(){
 
   const desc = $("desc").value.trim();
   const valor = parseFloat($("valor").value);
-  const tipo =
-    document.querySelector('input[name="tipo"]:checked')?.value;
 
   if(!desc || isNaN(valor)) return;
 
+  const tipo =
+  document.querySelector('input[name="tipo"]:checked').value;
+
   await addDoc(collection(db,"transacoes"),{
+
     desc,
     valor,
     tipo,
+
     categoria:$("categoria").value,
     vencimento:$("vencimento").value,
+
     fixo:$("fixo").checked,
     parcelado:$("parcelado").checked,
-    assinatura: $("assinatura")?.checked || false,
+    assinatura:$("assinatura").checked,
+
     parcelas:parseInt($("parcelas").value)||1,
+
     pago:false,
-    data:new Date(),
-    userId:auth.currentUser.uid,
     grupoId:grupoAtual,
-    autor:auth.currentUser.email
+
+    userId:auth.currentUser.uid,
+    autor:auth.currentUser.email,
+
+    data:new Date()
+
   });
 
   $("desc").value="";
   $("valor").value="";
 
-  carregar();
 }
 
-// ===================================
-// CARREGAR
-// ===================================
-async function carregar(){
 
-  // 📺 pega a lista de assinaturas
-  const listaAssinaturas = $("lista-assinaturas");
-  let totalAssinaturas = 0;
+/* =========================================================
+🎯 SALVAR META
+========================================================= */
+async function salvarMeta(){
 
-  // 🧹 limpa antes de renderizar
-  if(listaAssinaturas) listaAssinaturas.innerHTML = "";
+  const nome = $("tipo-meta").value;
+  const valor = parseFloat($("valor-meta").value);
 
-  // 📋 lista principal
-  const lista = $("lista");
+  if(isNaN(valor)) return;
 
-  const snapshot = await getDocs(
-    query(
-      collection(db,"transacoes"),
-      where("grupoId","==",grupoAtual),
-      orderBy("data","desc")
-    )
+  await addDoc(
+    collection(db,"metas"),
+    {
+      uid:auth.currentUser.uid,
+      nome,
+      valor,
+      criado:new Date()
+    }
   );
 
-  lista.innerHTML = "";
+  $("valor-meta").value="";
 
-    // 💰 dinheiro que você tem (receitas - despesas pagas)
-  let dinheiro = 0;
-
-  // 📄 total de contas (despesas)
-  let contas = 0;
-
-  // ⏳ quanto ainda falta pagar
-  let falta = 0;
-
-  let dados = {};
-
-  snapshot.forEach(docSnap=>{
-
-    const item = docSnap.data();
-    const id = docSnap.id;
-
-      // 📺 SE FOR ASSINATURA, MOSTRA NA LISTA SEPARADA
-    if(item.assinatura && listaAssinaturas){
-
-      // soma no total
-      totalAssinaturas += item.valor;
-
-      listaAssinaturas.innerHTML += `
-        <div class="card despesa">
-          📺 <strong>${item.desc}</strong><br>
-          R$ ${item.valor.toFixed(2)} / mês
-        </div>
-      `;
-    }
-    if(item.tipo==="receita"){
-
-      // 💰 dinheiro entra
-      dinheiro += item.valor;
-
-    }else{
-
-      // 📄 toda despesa entra como conta
-      contas += item.valor;
-
-      // ⏳ se NÃO foi paga ainda
-      if(!item.pago){
-        falta += item.valor;
-      }
-
-      // 💰 se já foi paga, desconta do dinheiro
-      if(item.pago){
-        dinheiro -= item.valor;
-      }
-
-      // gráfico continua igual
-      dados[item.categoria] =
-        (dados[item.categoria]||0)+item.valor;
-    }
-
-    if($("total-assinaturas")){
-      $("total-assinaturas").innerText =
-        totalAssinaturas.toLocaleString("pt-BR",{minimumFractionDigits:2});
-    }
-
-    const podeEditar =
-      item.userId === auth.currentUser.uid;
-
-    lista.innerHTML += `
-      <div class="card ${item.tipo}">
-        <strong>${item.desc}</strong><br>
-        ${item.categoria} • R$ ${item.valor.toFixed(2)}<br>
-        <small>por ${item.autor}</small>
-
-        <div class="acoes">
-          ${
-            podeEditar
-            ? `<button onclick="editarItem('${id}','${item.desc}',${item.valor})">✏️</button>
-               <button onclick="excluirItem('${id}')">🗑️</button>
-               <button onclick="marcarPago('${id}')">✅</button>`
-            : `<small>Somente visualização</small>`
-          }
-        </div>
-      </div>
-    `;
-  });
-
-  // 💰 mostra quanto tem em dinheiro
-  $("dinheiro").innerText =
-    dinheiro.toLocaleString("pt-BR",{minimumFractionDigits:2});
-
-  // 📄 total de contas
-  $("contas").innerText =
-    contas.toLocaleString("pt-BR",{minimumFractionDigits:2});
-
-  // ⏳ falta pagar
-  $("falta").innerText =
-    falta.toLocaleString("pt-BR",{minimumFractionDigits:2});
-
-    renderizarGrafico(dados);
 }
 
-// ===================================
-// GRAFICO
-// ===================================
-function renderizarGrafico(dados){
 
-  const ctx = $("meuGrafico");
+/* =========================================================
+📊 CARREGAR DADOS TEMPO REAL
+========================================================= */
+function carregar(){
 
-  if(meuGrafico) meuGrafico.destroy();
+  if(unsubscribe) unsubscribe();
 
-  meuGrafico = new Chart(ctx,{
+  const q = query(
+    collection(db,"transacoes"),
+    where("grupoId","==",grupoAtual),
+    orderBy("data","desc")
+  );
+
+  unsubscribe = onSnapshot(q,(snapshot)=>{
+
+    let dinheiro = 0;
+    let contas = 0;
+    let falta = 0;
+    let totalAss = 0;
+
+    let dados = {};
+
+    $("lista").innerHTML = "";
+    $("lista-assinaturas").innerHTML = "";
+
+    snapshot.forEach(docSnap=>{
+
+      const item = docSnap.data();
+      const id = docSnap.id;
+
+      if(item.tipo === "receita"){
+        dinheiro += item.valor;
+      }else{
+        contas += item.valor;
+        if(!item.pago) falta += item.valor;
+      }
+
+      if(item.assinatura){
+        totalAss += item.valor;
+      }
+
+      if(item.tipo === "despesa"){
+        dados[item.categoria] =
+          (dados[item.categoria]||0) + item.valor;
+      }
+
+      $("lista").innerHTML += `
+        <div class="card ${item.tipo}">
+          <strong>${item.desc}</strong><br>
+          ${item.categoria} • R$ ${item.valor.toFixed(2)}
+
+          <div class="acoes">
+            <button onclick="pagar('${id}')">✅</button>
+            <button onclick="excluir('${id}')">🗑️</button>
+          </div>
+        </div>
+      `;
+
+      if(item.assinatura){
+
+        $("lista-assinaturas").innerHTML += `
+          <div class="card despesa">
+            📺 ${item.desc}
+            - R$ ${item.valor.toFixed(2)}
+          </div>
+        `;
+
+      }
+
+    });
+
+    $("dinheiro").innerText = dinheiro.toFixed(2);
+    $("contas").innerText = contas.toFixed(2);
+    $("falta").innerText = falta.toFixed(2);
+    $("total-assinaturas").innerText = totalAss.toFixed(2);
+
+    graficoPizza(dados);
+    dicas(dinheiro,contas,totalAss);
+
+  });
+
+  carregarMetas();
+
+}
+
+
+/* =========================================================
+📈 GRÁFICO
+========================================================= */
+function graficoPizza(dados){
+
+  if(grafico) grafico.destroy();
+
+  grafico = new Chart($("meuGrafico"),{
     type:"doughnut",
     data:{
       labels:Object.keys(dados),
       datasets:[{
         data:Object.values(dados)
       }]
+    },
+    options:{
+      plugins:{
+        legend:{
+          labels:{
+            color:"#fff"
+          }
+        }
+      }
     }
   });
+
 }
 
-// ===================================
-// CRUD
-// ===================================
-async function excluirItem(id){
+
+/* =========================================================
+🎯 CARREGAR METAS
+========================================================= */
+function carregarMetas(){
+
+  const q = query(
+    collection(db,"metas"),
+    where("uid","==",auth.currentUser.uid)
+  );
+
+  onSnapshot(q,(snapshot)=>{
+
+    $("lista-metas").innerHTML = "";
+
+    snapshot.forEach(docSnap=>{
+
+      const item = docSnap.data();
+
+      $("lista-metas").innerHTML += `
+        <div class="card">
+          <strong>${item.nome}</strong><br>
+          Meta: R$ ${item.valor.toFixed(2)}
+        </div>
+      `;
+
+    });
+
+  });
+
+}
+
+
+/* =========================================================
+🤖 DICAS
+========================================================= */
+function dicas(dinheiro,contas,ass){
+
+  let texto = "";
+
+  if(contas > dinheiro){
+    texto += "⚠️ Você gastou mais do que ganhou.<br>";
+  }else{
+    texto += "✅ Suas contas estão saudáveis.<br>";
+  }
+
+  if(ass > 100){
+    texto += "📺 Reveja assinaturas para economizar.<br>";
+  }
+
+  texto += "✈️ Guardando R$10/dia gera viagem futura.";
+
+  $("dicas-financeiras").innerHTML =
+    `<div class="card">${texto}</div>`;
+
+}
+
+
+/* =========================================================
+🗑 EXCLUIR
+========================================================= */
+async function excluir(id){
   await deleteDoc(doc(db,"transacoes",id));
-  carregar();
 }
 
-async function marcarPago(id){
-  await updateDoc(doc(db,"transacoes",id),{
-    pago:true
-  });
-  carregar();
+
+/* =========================================================
+✅ PAGAR
+========================================================= */
+async function pagar(id){
+  await updateDoc(
+    doc(db,"transacoes",id),
+    { pago:true }
+  );
 }
 
-async function editarItem(id,desc,valor){
 
-  const { value } = await Swal.fire({
-    title:"Editar",
-    html:`
-      <input id="novoDesc" class="swal2-input" value="${desc}">
-      <input id="novoValor" class="swal2-input" type="number" value="${valor}">
-    `,
-    preConfirm:()=>({
-      desc:$("novoDesc").value,
-      valor:parseFloat($("novoValor").value)
-    })
-  });
-
-  if(!value) return;
-
-  await updateDoc(doc(db,"transacoes",id),value);
-
-  carregar();
-}
-
-// ===================================
-// PDF
-// ===================================
-function gerarPDF(){
-  Swal.fire("PDF mantido da versão anterior");
-}
-
-// ===================================
-// EVENTOS
-// ===================================
-if(btnLogin) btnLogin.onclick = login;
-if(btnCadastrar) btnCadastrar.onclick = cadastrar;
-if(btnGoogle) btnGoogle.onclick = loginGoogle;
-if(btnRecuperar) btnRecuperar.onclick = recuperarSenha;
-if(btnSalvar) btnSalvar.onclick = salvar;
-if(btnPdf) btnPdf.onclick = gerarPDF;
-if(btnSair) btnSair.onclick = ()=>signOut(auth);
-
-if(btnSolo) btnSolo.onclick = ativarSolo;
-if(btnCasal) btnCasal.onclick = ativarCasal;
-
-if(btnConvidar) btnConvidar.onclick = convidarParceiro;
-if(btnEntrarGrupo) btnEntrarGrupo.onclick = entrarGrupo;
-
-document
-  .querySelectorAll('input[name="tipo"]')
-  .forEach(el=>{
-    el.addEventListener("change", carregarCategorias);
-  });
-
-// ===================================
-// LOGIN STATE
-// ===================================
-onAuthStateChanged(auth, async user=>{
+/* =========================================================
+🔐 LOGIN STATE
+========================================================= */
+onAuthStateChanged(auth, async(user)=>{
 
   if(user){
 
     $("secao-login").style.display="none";
     $("secao-app").style.display="block";
-    $("usuario-logado").innerText=user.email;
+
+    $("usuario-logado").innerText = user.email;
 
     await criarPerfil(user);
     await carregarPerfil();
 
-    // 🔥 GARANTE QUE CARREGA SEMPRE
     carregarCategorias();
-
     carregar();
 
   }else{
 
     $("secao-login").style.display="block";
     $("secao-app").style.display="none";
+
   }
+
 });
 
-// GLOBAL
-window.excluirItem = excluirItem;
-window.editarItem = editarItem;
-window.marcarPago = marcarPago;
+
+/* =========================================================
+🔘 EVENTOS
+========================================================= */
+$("btn-login").onclick = login;
+$("btn-cadastrar").onclick = cadastrar;
+$("btn-google").onclick = loginGoogle;
+$("btn-recuperar").onclick = recuperarSenha;
+
+$("btn-ver-senha").onclick = verSenha;
+$("btn-tema").onclick = trocarTema;
+
+$("btn-upgrade").onclick = planos;
+$("btn-casal").onclick = ativarCasal;
+
+$("btn-convidar").onclick = convidar;
+$("btn-entrar-grupo").onclick = entrarGrupo;
+
+$("btn-salvar").onclick = salvar;
+$("btn-salvar-meta").onclick = salvarMeta;
+
+$("btn-sair").onclick = ()=>signOut(auth);
+
+
+/* =========================================================
+🌍 GLOBAL
+========================================================= */
+window.excluir = excluir;
+window.pagar = pagar;
+
+
+/* =========================================================
+🚀 INICIAR
+========================================================= */
+iniciarTema();
