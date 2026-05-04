@@ -1,14 +1,11 @@
 /* =====================================================
-💙 NÓS DOIS & EU - STYLE.CSS DEFINITIVO
-Comentado como se eu mesmo tivesse criado
-Tema Claro / Escuro
-Responsivo
-Visual Premium
+💙 NÓS DOIS & EU - STYLE V2 (PRO)
+SaaS Ready | Escalável | Premium UI
 ===================================================== */
 
 
 /* =====================================================
-🔄 RESET GERAL
+🔄 RESET
 ===================================================== */
 *{
   margin:0;
@@ -18,12 +15,13 @@ Visual Premium
 
 
 /* =====================================================
-🎨 VARIÁVEIS GLOBAIS
-Tema escuro padrão
+🎨 VARIÁVEIS (DARK DEFAULT)
 ===================================================== */
 :root{
 
   --bg:#0f172a;
+  --bg-soft:#020617;
+
   --card:#1e293b;
   --card2:#111827;
 
@@ -38,7 +36,9 @@ Tema escuro padrão
   --verde:#22c55e;
   --vermelho:#ef4444;
   --roxo:#7c3aed;
-  --cinza:#475569;
+  --amarelo:#f59e0b;
+
+  --premium:#facc15;
 
   --sombra:0 10px 25px rgba(0,0,0,.25);
 
@@ -46,21 +46,22 @@ Tema escuro padrão
 
 
 /* =====================================================
-☀️ TEMA CLARO
-JS troca class="light"
+☀️ LIGHT MODE
 ===================================================== */
 body.light{
 
   --bg:#f8fafc;
+  --bg-soft:#e2e8f0;
+
   --card:#ffffff;
-  --card2:#e2e8f0;
+  --card2:#f1f5f9;
 
   --texto:#0f172a;
-  --texto2:#334155;
+  --texto2:#475569;
 
   --borda:#cbd5e1;
 
-  --sombra:0 10px 25px rgba(0,0,0,.08);
+  --sombra:0 8px 20px rgba(0,0,0,.08);
 
 }
 
@@ -70,9 +71,14 @@ body.light{
 ===================================================== */
 body{
 
-  font-family:Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', Roboto, sans-serif;
 
-  background:var(--bg);
+  background:linear-gradient(
+    180deg,
+    var(--bg),
+    var(--bg-soft)
+  );
+
   color:var(--texto);
 
   max-width:520px;
@@ -95,33 +101,27 @@ body{
 }
 
 .topo h1{
-
-  font-size:28px;
-  margin-bottom:6px;
-
-}
-
-.topo p{
-
-  font-size:13px;
-  color:var(--texto2);
-  margin-bottom:5px;
-
+  font-size:26px;
 }
 
 .topo small{
 
-  display:block;
-  margin-bottom:10px;
-  font-size:12px;
-  color:#facc15;
+  display:inline-block;
+  margin-top:6px;
+
+  padding:4px 10px;
+  border-radius:999px;
+
+  background:rgba(250,204,21,.15);
+  color:var(--premium);
   font-weight:bold;
+  font-size:11px;
 
 }
 
 
 /* =====================================================
-📦 BOX PADRÃO
+📦 BOX
 ===================================================== */
 .box{
 
@@ -133,24 +133,34 @@ body{
   margin-bottom:18px;
 
   box-shadow:var(--sombra);
-
   border:1px solid var(--borda);
-
-}
-
-.box h2,
-.box h3{
-
-  margin-bottom:12px;
 
 }
 
 
 /* =====================================================
-⌨ INPUT / SELECT / BUTTON
+⌨ INPUTS
 ===================================================== */
-input,
-select,
+input, select{
+
+  width:100%;
+  padding:12px;
+
+  margin-top:10px;
+
+  border-radius:12px;
+
+  border:1px solid var(--borda);
+
+  background:var(--bg);
+  color:var(--texto);
+
+}
+
+
+/* =====================================================
+🔘 BOTÕES
+===================================================== */
 button{
 
   width:100%;
@@ -161,96 +171,61 @@ button{
   border:none;
   border-radius:12px;
 
-  font-size:14px;
-
-}
-
-
-/* =====================================================
-⌨ INPUTS
-===================================================== */
-input,
-select{
-
-  background:var(--bg);
-  color:var(--texto);
-
-  border:1px solid var(--borda);
-
-}
-
-
-/* =====================================================
-🔘 BOTÕES
-===================================================== */
-button{
-
-  background:var(--azul);
-  color:#fff;
-
   font-weight:bold;
   cursor:pointer;
 
-  transition:.20s;
+  background:linear-gradient(
+    135deg,
+    var(--azul),
+    var(--azul2)
+  );
+
+  color:#fff;
+
+  transition:.2s;
 
 }
 
 button:hover{
-
   transform:translateY(-2px);
-  opacity:.95;
+}
 
+button:active{
+  transform:scale(.98);
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
 }
 
 
-/* =====================================================
-🔘 VARIAÇÕES
-===================================================== */
-.secundario{
-
-  background:var(--cinza);
-
-}
-
-.danger{
-
-  background:var(--vermelho);
-
-}
-
-.google{
-
-  background:#ffffff;
-  color:#111111;
-
-}
+/* VARIAÇÕES */
+.secundario{ background:var(--card2); }
+.danger{ background:var(--vermelho); }
+.google{ background:#fff; color:#000; }
 
 .mini-btn{
-
   width:auto;
-  padding:8px 14px;
+  padding:6px 12px;
   font-size:12px;
-  margin-top:10px;
-
 }
 
 
 /* =====================================================
-📐 GRID 2 COLUNAS
+📐 GRID
 ===================================================== */
 .grid2{
 
   display:grid;
   grid-template-columns:1fr 1fr;
-
   gap:10px;
-  margin-bottom:15px;
 
 }
 
 
 /* =====================================================
-💰 CARDS DE SALDO
+💰 SALDO
 ===================================================== */
 .saldo-card{
 
@@ -260,28 +235,13 @@ button:hover{
     var(--azul2)
   );
 
-  padding:20px;
+  padding:18px;
   border-radius:18px;
 
   box-shadow:0 10px 20px rgba(37,99,235,.35);
 
 }
 
-.saldo-card small{
-
-  opacity:.95;
-
-}
-
-.saldo-card h2{
-
-  margin-top:6px;
-  font-size:28px;
-
-}
-
-
-/* Card Roxo */
 .secundario-card{
 
   background:linear-gradient(
@@ -293,16 +253,8 @@ button:hover{
 }
 
 
-/* Destaque */
-.destaque{
-
-  margin-bottom:18px;
-
-}
-
-
 /* =====================================================
-📋 CARDS INTERNOS
+📋 CARDS
 ===================================================== */
 .card{
 
@@ -318,36 +270,31 @@ button:hover{
 }
 
 
-/* Receita */
-.card.receita{
+/* TIPOS */
+.card.receita{ border-left-color:var(--verde); }
+.card.despesa{ border-left-color:var(--vermelho); }
 
-  border-left-color:var(--verde);
-
-}
-
-/* Despesa */
-.card.despesa{
-
-  border-left-color:var(--vermelho);
-
+/* ASSINATURA */
+.card.assinatura{
+  border-left-color:var(--amarelo);
 }
 
 
 /* =====================================================
-⚙ AÇÕES INTERNAS
+⚙️ AÇÕES
 ===================================================== */
 .acoes{
 
   display:flex;
-  gap:8px;
+  gap:6px;
   margin-top:10px;
 
 }
 
 .acoes button{
 
-  margin-top:0;
-  padding:8px;
+  flex:1;
+  padding:6px;
   font-size:12px;
 
 }
@@ -357,9 +304,7 @@ button:hover{
 📊 GRÁFICO
 ===================================================== */
 #meuGrafico{
-
   max-height:280px;
-
 }
 
 
@@ -369,15 +314,13 @@ button:hover{
 .progresso{
 
   width:100%;
-  height:12px;
+  height:10px;
 
   background:#1f2937;
-
   border-radius:50px;
 
   overflow:hidden;
-
-  margin-top:8px;
+  margin-top:6px;
 
 }
 
@@ -396,144 +339,71 @@ button:hover{
 
 
 /* =====================================================
-💌 STATUS CASAL
+🤖 ALERTAS IA
 ===================================================== */
-#status-casal{
+.alerta{
 
-  display:block;
-  margin-top:10px;
+  border-left:5px solid var(--amarelo);
+  background:rgba(245,158,11,.1);
 
-  color:var(--texto2);
-  font-size:13px;
+}
+
+.sucesso{
+
+  border-left:5px solid var(--verde);
+  background:rgba(34,197,94,.1);
+
+}
+
+.perigo{
+
+  border-left:5px solid var(--vermelho);
+  background:rgba(239,68,68,.1);
 
 }
 
 
 /* =====================================================
-📺 ASSINATURAS
+💎 PREMIUM
 ===================================================== */
-#lista-assinaturas .card{
+.premium-badge{
 
-  border-left-color:#f59e0b;
+  display:inline-block;
+  background:var(--premium);
+  color:#000;
+
+  padding:3px 8px;
+  border-radius:999px;
+
+  font-size:10px;
+  font-weight:bold;
+
+  margin-left:6px;
 
 }
 
 
 /* =====================================================
-🤖 DICAS
-===================================================== */
-#dicas-financeiras .card{
-
-  border-left-color:#06b6d4;
-
-}
-
-
-/* =====================================================
-📭 LISTA VAZIA
+📭 VAZIO
 ===================================================== */
 .vazio{
-
   text-align:center;
   color:var(--texto2);
-
-  padding:15px;
-
+  padding:12px;
 }
 
 
 /* =====================================================
-✨ ANIMAÇÃO SUAVE
-===================================================== */
-.box,
-.card,
-button{
-
-  transition:.25s;
-
-}
-
-
-/* =====================================================
-📱 MOBILE
+📱 RESPONSIVO
 ===================================================== */
 @media(max-width:500px){
 
-  body{
-
-    padding:14px;
-
-  }
-
   .grid2{
-
     grid-template-columns:1fr;
-
   }
-
-  .saldo-card h2{
-
-    font-size:24px;
-
-  }
-
-}
-
-
-/* =====================================================
-🖥 TELAS MAIORES
-===================================================== */
-@media(min-width:700px){
 
   body{
-
-    max-width:620px;
-
+    padding:14px;
   }
 
 }
-
-
-/* =====================================================
-🌙 MODO ESCURO EXTRA
-===================================================== */
-body.dark{
-
-  background:
-  linear-gradient(
-    180deg,
-    #0f172a,
-    #020617
-  );
-
-}
-
-
-/* =====================================================
-☀️ MODO CLARO EXTRA
-===================================================== */
-body.light{
-
-  background:
-  linear-gradient(
-    180deg,
-    #f8fafc,
-    #e2e8f0
-  );
-
-}
-
-
-/* =====================================================
-💎 EFEITO PREMIUM
-===================================================== */
-button:active{
-
-  transform:scale(.98);
-
-}
-
-
-/* =====================================================
-📌 FIM
-===================================================== */
