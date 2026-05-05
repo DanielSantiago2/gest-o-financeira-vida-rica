@@ -1,9 +1,21 @@
 // IMPORTAÇÕES
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    signOut, 
+    onAuthStateChanged, 
+    GoogleAuthProvider, 
+    signInWithPopup,
+    sendPasswordResetEmail 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { 
+    getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, 
+    deleteDoc, updateDoc, query, where, onSnapshot, orderBy 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// CONFIG (Suas credenciais originais)
+// CONFIG (Suas credenciais mantidas)
 const firebaseConfig = {
     apiKey: "AIzaSyD7Kr-ee-NLtK21wVh1GBLazZKIeigkzsU",
     authDomain: "vida-rica-app-bc076.firebaseapp.com",
@@ -16,18 +28,81 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
-// ESTADO GLOBAL DO APP
+// ESTADO GLOBAL
 let usuarioDados = {};
-let unsubscribe = null; // Para limpar o Real-time sync quando necessário
+let unsubscribe = null;
 
-// ELEMENTOS DE INTERFACE
+// ELEMENTOS
 const loginSec = document.getElementById("secao-login");
 const appSec = document.getElementById("secao-app");
 const listaContas = document.getElementById("lista");
 const dicasIA = document.getElementById("dicas-financeiras");
 
-// --- 1. AUTENTICAÇÃO E PLANOS ---
+// --- 1. FUNÇÕES DE ACESSO (LOGIN / CADASTRO / SENHA) ---
+
+// Alternar visibilidade da senha (OLHINHO)
+document.getElementById("btn-ver-senha").onclick = (e) => {
+    e.preventDefault();
+    const senhaInput = document.getElementById("senha");
+    if (senhaInput.type === "password") {
+        senhaInput.type = "text";
+        e.target.innerText = "🙈";
+    } else {
+        senhaInput.type = "password";
+        e.target.innerText = "👁️";
+    }
+};
+
+// Login com E-mail e Senha
+document.getElementById("btn-login").onclick = async () => {
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+    try {
+        await signInWithEmailAndPassword(auth, email, senha);
+    } catch (e) {
+        Swal.fire("Erro", "E-mail ou senha inválidos", "error");
+    }
+};
+
+// Criar Conta
+document.getElementById("btn-cadastrar").onclick = async () => {
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+    if (senha.length < 6) return Swal.fire("Atenção", "Senha deve ter no mínimo 6 dígitos", "warning");
+    try {
+        await createUserWithEmailAndPassword(auth, email, senha);
+        Swal.fire("Sucesso", "Conta criada com sucesso!", "success");
+    } catch (e) {
+        Swal.fire("Erro", "Não foi possível criar a conta.", "error");
+    }
+};
+
+// Login com GOOGLE
+document.getElementById("btn-google").onclick = async () => {
+    try {
+        await signInWithPopup(auth, googleProvider);
+    } catch (e) {
+        Swal.fire("Erro", "Falha na autenticação com Google.", "error");
+    }
+};
+
+// Esqueci minha senha
+document.getElementById("btn-esqueci-senha").onclick = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    if (!email) return Swal.fire("E-mail necessário", "Digite seu e-mail no campo acima primeiro.", "info");
+    
+    try {
+        await sendPasswordResetEmail(auth, email);
+        Swal.fire("E-mail enviado", "Verifique sua caixa de entrada para resetar a senha.", "success");
+    } catch (e) {
+        Swal.fire("Erro", "E-mail não encontrado.", "error");
+    }
+};
+
+// --- 2. GESTÃO DE ESTADO E PLANOS ---
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -35,7 +110,6 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
     
-    // Carrega Perfil
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
     
@@ -44,7 +118,7 @@ onAuthStateChanged(auth, async (user) => {
             email: user.email,
             plano: "free",
             modo: "solteiro",
-            trialTermina: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            criadoEm: new Date().toISOString()
         };
         await setDoc(userRef, usuarioDados);
     } else {
@@ -60,37 +134,33 @@ function renderHeader(user) {
     appSec.style.display = "block";
     document.getElementById("usuario-logado").innerText = user.email;
     const plano = document.getElementById("plano-usuario");
-    plano.innerText = usuarioDados.plano.toUpperCase();
+    plano.innerText = (usuarioDados.plano || "FREE").toUpperCase();
     
-    // Controle de Sincronização Manual (Plano Free)
     const syncBox = document.getElementById("container-sync-manual");
     syncBox.style.display = usuarioDados.plano === "free" ? "block" : "none";
 }
 
-// --- 2. FLUXO DE DADOS (FREE VS PAID) ---
-
 function initDataFlow(user) {
     if (usuarioDados.plano === "free") {
-        // Modo Manual: Só carrega uma vez
         carregarDados(user);
         document.getElementById("btn-sync-manual").onclick = () => carregarDados(user);
     } else {
-        // Modo Premium: Real-time Sync (Sincronização Automática)
         if (unsubscribe) unsubscribe();
         const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
         unsubscribe = onSnapshot(q, () => carregarDados(user));
     }
 }
 
-// --- 3. LÓGICA DE TRANSAÇÕES (REFATORADA) ---
+// --- 3. TRANSAÇÕES ---
 
 document.getElementById("btn-salvar").onclick = async () => {
     const user = auth.currentUser;
     const desc = document.getElementById("desc").value;
-    const valor = Number(document.getElementById("valor").value);
+    const valorInput = document.getElementById("valor").value;
+    const valor = Number(valorInput);
     const tipo = document.querySelector('input[name="tipo"]:checked').value;
-    const fixo = document.getElementById("fixo").checked;
     const categoria = document.getElementById("categoria").value;
+    const dataVenc = document.getElementById("vencimento").value;
 
     if (!desc || !valor) return Swal.fire("Erro", "Preencha os campos!", "error");
 
@@ -100,34 +170,21 @@ document.getElementById("btn-salvar").onclick = async () => {
         valor: tipo === "despesa" ? -Math.abs(valor) : Math.abs(valor),
         categoria,
         pago: false,
-        data: document.getElementById("vencimento").value || new Date().toISOString(),
+        data: dataVenc || new Date().toISOString(),
         isAssinatura: categoria === "Assinatura"
     };
 
     try {
-        // Se for FIXO: Cadastra 3 meses para não sobrecarregar
-        if (fixo) {
-            for (let i = 0; i < 3; i++) {
-                let dataFutura = new Date(transacao.data);
-                dataFutura.setMonth(dataFutura.getMonth() + i);
-                await addDoc(collection(db, "transactions"), {
-                    ...transacao,
-                    data: dataFutura.toISOString(),
-                    desc: `${desc} (${i+1}/3)`
-                });
-            }
-        } else {
-            await addDoc(collection(db, "transactions"), transacao);
-        }
-
+        await addDoc(collection(db, "transactions"), transacao);
         Swal.fire("Sucesso", "Lançamento realizado!", "success");
+        // Limpar campos
+        document.getElementById("desc").value = "";
+        document.getElementById("valor").value = "";
         if (usuarioDados.plano === "free") carregarDados(user);
     } catch (e) {
         console.error(e);
     }
 };
-
-// --- 4. RELATÓRIOS E IA ---
 
 async function carregarDados(user) {
     const q = query(collection(db, "transactions"), where("userId", "==", user.uid), orderBy("data", "desc"));
@@ -145,7 +202,6 @@ async function carregarDados(user) {
         if (valor > 0) totalReceita += valor;
         else totalDespesa += Math.abs(valor);
 
-        // Mapa para Gráfico
         categoriasMapa[d.categoria] = (categoriasMapa[d.categoria] || 0) + Math.abs(valor);
 
         listaHtml += `
@@ -154,16 +210,15 @@ async function carregarDados(user) {
                     <strong>${d.desc} ${d.isAssinatura ? '📺' : ''}</strong>
                     <span>R$ ${Math.abs(valor).toFixed(2)}</span>
                 </div>
-                <small>${new Date(d.data).toLocaleDateString()}</small>
+                <small>${new Date(d.data).toLocaleDateString('pt-BR')}</small>
                 <div class="acoes">
-                    <button onclick="alterarStatus('${docSnap.id}', ${d.pago})">${d.pago ? '✅ Pago' : '⏳ Pagar'}</button>
-                    <button class="danger" onclick="excluirTransacao('${docSnap.id}')">🗑</button>
+                    <button onclick="window.alterarStatus('${docSnap.id}', ${d.pago})">${d.pago ? '✅ Pago' : '⏳ Pagar'}</button>
+                    <button class="danger" onclick="window.excluirTransacao('${docSnap.id}')">🗑</button>
                 </div>
             </div>
         `;
     });
 
-    // Atualiza UI
     document.getElementById("dinheiro").innerText = totalReceita.toFixed(2);
     document.getElementById("contas").innerText = totalDespesa.toFixed(2);
     document.getElementById("falta").innerText = (totalReceita - totalDespesa).toFixed(2);
@@ -173,51 +228,18 @@ async function carregarDados(user) {
     executarIA(totalReceita, totalDespesa, categoriasMapa);
 }
 
-// IA: Conselheiro Financeiro Simples
+// --- 4. UTILITÁRIOS (IA, GRÁFICO, TEMA) ---
+
 function executarIA(receita, despesa, categorias) {
     let conselho = "✅ Suas finanças estão equilibradas. Continue assim!";
-    const porcDespesa = (despesa / receita) * 100;
-
-    if (porcDespesa > 80) {
-        conselho = "⚠️ Cuidado! Você está gastando mais de 80% do que ganha. Tente reduzir gastos variáveis.";
-    }
+    if (despesa > receita) conselho = "🚨 Atenção: Suas despesas superaram suas receitas este mês!";
+    else if ((despesa / receita) > 0.8) conselho = "⚠️ Alerta: Você está comprometendo 80% da sua renda.";
     
-    if (categorias["Assinatura"] > (receita * 0.1)) {
-        conselho = "📺 Alerta de Assinaturas: Seus streamings somam mais de 10% da sua renda. Que tal cancelar o que não usa?";
-    }
-
     dicasIA.innerText = conselho;
 }
 
-// --- 5. INTEGRAÇÃO ASAAS (SIMULAÇÃO DE GATEWAY) ---
-document.getElementById("btn-upgrade").onclick = () => {
-    Swal.fire({
-        title: 'Escolha seu Plano',
-        html: `
-            <button class="button" onclick="window.checkout('SOLTEIRO')">Solteiro - R$ 19,90</button>
-            <button class="button" onclick="window.checkout('CASAL')">Casal - R$ 29,90</button>
-        `,
-        showConfirmButton: false
-    });
-};
-
-window.checkout = (tipo) => {
-    // Aqui você chamaria sua API que comunica com o Asaas
-    Swal.fire("Integração Asaas", `Redirecionando para o Checkout ${tipo}... Em um sistema real, aqui geramos o PIX via API.`, "info");
-};
-
-// --- FUNÇÕES GLOBAIS (WINDOW) ---
-window.excluirTransacao = async (id) => {
-    const result = await Swal.fire({ title: 'Excluir?', showCancelButton: true });
-    if (result.isConfirmed) {
-        await deleteDoc(doc(db, "transactions", id));
-        if (usuarioDados.plano === "free") carregarDados(auth.currentUser);
-    }
-};
-
-window.alterarStatus = async (id, statusAtual) => {
-    await updateDoc(doc(db, "transactions", id), { pago: !statusAtual });
-    if (usuarioDados.plano === "free") carregarDados(auth.currentUser);
+document.getElementById("btn-tema").onclick = () => {
+    document.body.classList.toggle("light");
 };
 
 // Gráfico
@@ -234,18 +256,36 @@ function atualizarGrafico(dados) {
                 backgroundColor: ['#2563eb', '#ef4444', '#facc15', '#7c3aed', '#22c55e']
             }]
         },
-        options: { plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+        options: { 
+            responsive: true,
+            plugins: { legend: { position: 'bottom', labels: { color: document.body.classList.contains('light') ? '#000' : '#fff' } } } 
+        }
     });
 }
 
 // PDF Export
 document.getElementById("btn-pdf").onclick = () => {
+    Swal.fire("PDF", "Gerando relatório...", "success");
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text("Relatório Financeiro - Nós Dois & Eu", 10, 10);
-    // Aqui usamos o autoTable para gerar a lista
-    Swal.fire("PDF", "Gerando relatório colorido...", "success");
-    doc.save("financeiro.pdf");
+    const docPdf = new jsPDF();
+    docPdf.text("Relatório Nós Dois & Eu", 10, 10);
+    docPdf.text(`Total Receitas: R$ ${document.getElementById("dinheiro").innerText}`, 10, 20);
+    docPdf.text(`Total Despesas: R$ ${document.getElementById("contas").innerText}`, 10, 30);
+    docPdf.save("financeiro.pdf");
+};
+
+// Funções Globais
+window.excluirTransacao = async (id) => {
+    const res = await Swal.fire({ title: 'Excluir transação?', showCancelButton: true });
+    if (res.isConfirmed) {
+        await deleteDoc(doc(db, "transactions", id));
+        if (usuarioDados.plano === "free") carregarDados(auth.currentUser);
+    }
+};
+
+window.alterarStatus = async (id, statusAtual) => {
+    await updateDoc(doc(db, "transactions", id), { pago: !statusAtual });
+    if (usuarioDados.plano === "free") carregarDados(auth.currentUser);
 };
 
 function showLogin() {

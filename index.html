@@ -24,9 +24,19 @@
 <section id="secao-login" class="box">
     <h2>Bem-vindo</h2>
     <input type="email" id="email" placeholder="Seu e-mail">
-    <input type="password" id="senha" placeholder="Sua senha">
+    
+    <div style="position: relative; width: 100%;">
+        <input type="password" id="senha" placeholder="Sua senha" style="padding-right: 40px;">
+        <button id="btn-ver-senha" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
+    </div>
+
+    <p style="text-align: right; margin-top: 5px;">
+        <a href="#" id="btn-esqueci-senha" style="color: var(--primaria); font-size: 0.85rem; text-decoration: none;">Esqueci minha senha</a>
+    </p>
+
     <button id="btn-login">Entrar</button>
     <button id="btn-cadastrar" class="secundario">Criar Conta</button>
+    <div style="margin: 15px 0; text-align: center; color: #888;">ou</div>
     <button id="btn-google" class="google">Entrar com Google</button>
 </section>
 
@@ -94,6 +104,7 @@
     </div>
 </section>
 
+<!-- IMPORTANTE: O nome do arquivo aqui deve ser igual ao seu arquivo JS local -->
 <script type="module" src="script.js"></script>
 </body>
 </html>
