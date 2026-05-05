@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nós Dois & Eu | Gestão Financeira SaaS</title>
+    <title>Nós Dois & Eu | SaaS Financeiro</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="dark">
 
@@ -17,7 +16,7 @@
     <p id="usuario-logado">Carregando...</p>
     <small id="plano-usuario">PLANO...</small>
     <div id="container-sync-manual" style="display:none; margin-top: 10px;">
-        <button id="btn-sync-manual" class="mini-btn">🔄 Atualizar Agora (Manual)</button>
+        <button id="btn-sync-manual" class="mini-btn">🔄 Atualizar Agora</button>
     </div>
     <button id="btn-tema" class="mini-btn">🌙 / ☀️</button>
 </header>
@@ -32,7 +31,6 @@
 </section>
 
 <section id="secao-app" style="display:none;">
-    <!-- Resumo de Saldos -->
     <div class="grid2">
         <div class="saldo-card">
             <small>Receitas</small>
@@ -48,7 +46,6 @@
         <h2 id="falta-container">R$ <span id="falta">0,00</span></h2>
     </div>
 
-    <!-- Seletor de Perfil -->
     <div class="box">
         <h3>👤 Perfil de Uso</h3>
         <select id="select-modo">
@@ -57,87 +54,46 @@
         </select>
     </div>
 
-    <!-- Ações Premium -->
     <div class="grid2">
         <button id="btn-upgrade" style="background: var(--premium); color: #000">👑 Ver Planos</button>
         <button id="btn-pdf">📄 Exportar PDF</button>
     </div>
 
-    <!-- Área Casal -->
-    <div id="area-casal" class="box" style="display:none;">
-        <h3>💙 Convidar Parceiro(a)</h3>
-        <input type="email" id="email-parceiro" placeholder="E-mail do amor">
-        <div class="grid2">
-            <button id="btn-convidar-wa" class="secundario">WhatsApp</button>
-            <button id="btn-convidar-email">E-mail</button>
-        </div>
-        <small id="status-casal">Aguardando conexão...</small>
-    </div>
-
-    <!-- Cadastro de Transação -->
     <div class="box">
         <h3>➕ Nova Transação</h3>
-        <input type="text" id="desc" placeholder="Ex: Aluguel, Salário...">
+        <input type="text" id="desc" placeholder="Descrição">
         <input type="number" id="valor" placeholder="Valor R$">
         <input type="date" id="vencimento">
-        
         <div class="grid2">
             <label><input type="radio" name="tipo" value="despesa" checked> Gasto</label>
             <label><input type="radio" name="tipo" value="receita"> Ganho</label>
         </div>
-
         <select id="categoria">
-            <option value="Lazer">Lazer</option>
-            <option value="Alimentação">Alimentação</option>
             <option value="Moradia">Moradia</option>
-            <option value="Assinatura">Assinatura (Streamings, etc)</option>
+            <option value="Alimentação">Alimentação</option>
+            <option value="Assinatura">Assinatura (Netflix, etc)</option>
+            <option value="Lazer">Lazer</option>
             <option value="Outros">Outros</option>
         </select>
-
-        <div class="grid2">
-            <label><input type="checkbox" id="fixo"> Fixo (3 meses)</label>
-            <label><input type="checkbox" id="parcelado"> Parcelado</label>
-        </div>
-        <input type="number" id="parcelas" placeholder="Nº de parcelas" style="display:none;">
-
-        <button id="btn-salvar">Adicionar Registro</button>
-    </div>
-
-    <!-- Metas -->
-    <div class="box">
-        <h3>🎯 Minhas Metas</h3>
-        <div class="grid2">
-            <select id="tipo-meta">
-                <option value="Reserva">💰 Reserva de Emergência</option>
-                <option value="Viagem">✈️ Viagem</option>
-                <option value="Casa">🏠 Casa Própria</option>
-            </select>
-            <input type="number" id="valor-meta" placeholder="Objetivo R$">
-        </div>
-        <button id="btn-salvar-meta">Definir Meta</button>
-        <div id="lista-metas"></div>
-    </div>
-
-    <!-- IA e Gráficos -->
-    <div class="box">
-        <h3>🤖 IA: Conselheiro de Gestão</h3>
-        <div id="dicas-financeiras" class="card alerta">
-            Analisando seus dados para dar conselhos...
-        </div>
+        <button id="btn-salvar">Adicionar</button>
     </div>
 
     <div class="box">
-        <h3>📊 Resumo Visual</h3>
+        <h3>🤖 IA Financeira</h3>
+        <div id="dicas-financeiras" class="card alerta">Analisando...</div>
+    </div>
+
+    <div class="box">
+        <h3>📊 Gráfico</h3>
         <canvas id="meuGrafico"></canvas>
     </div>
 
-    <!-- Lista -->
     <div class="box">
-        <h3>📋 Histórico de Lançamentos</h3>
+        <h3>📋 Histórico</h3>
         <div id="lista"></div>
     </div>
 </section>
 
-<script type="module" src="script.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
