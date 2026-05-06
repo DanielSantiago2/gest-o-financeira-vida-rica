@@ -19,6 +19,8 @@
         <button id="btn-sync-manual" class="mini-btn">🔄 Atualizar Agora</button>
     </div>
     <button id="btn-tema" class="mini-btn">🌙 / ☀️</button>
+    <button id="btn-sair" class="mini-btn danger">Sair</button>
+
 </header>
 
 <section id="secao-login" class="box">
@@ -38,6 +40,7 @@
     <button id="btn-cadastrar" class="secundario">Criar Conta</button>
     <div style="margin: 15px 0; text-align: center; color: #888;">ou</div>
     <button id="btn-google" class="google">Entrar com Google</button>
+    
 </section>
 
 <section id="secao-app" style="display:none;">
@@ -97,6 +100,18 @@
         <h3>📊 Gráfico</h3>
         <canvas id="meuGrafico"></canvas>
     </div>
+
+    <div class="box" id="container-metas">
+        <h3>🎯 Minhas Metas</h3>
+        <input type="text" id="meta-nome" placeholder="Ex: Reserva de Emergência">
+        <input type="number" id="meta-objetivo" placeholder="Valor total (R$)">
+        <button id="btn-salvar-meta" class="secundario">Criar Meta</button>
+        
+        <div id="lista-metas" style="margin-top: 15px;">
+            <!-- As metas aparecerão aqui -->
+        </div>
+    </div>
+</div>
 
     <div class="box">
         <h3>📋 Histórico</h3>
