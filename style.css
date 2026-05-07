@@ -200,3 +200,26 @@ button:disabled{ opacity:.5; cursor:not-allowed; }
   .grid2{ grid-template-columns:1fr; }
   body{ padding:14px; }
 }
+
+/* Barra de Progresso das Metas */
+.progresso-bg {
+    background: var(--bg-soft);
+    border-radius: 999px;
+    height: 12px;
+    width: 100%;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.progresso-barra {
+    background: linear-gradient(90deg, var(--verde), var(--azul));
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+}
+
+.meta-item {
+    background: var(--card2);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}

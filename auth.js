@@ -24,6 +24,8 @@ const tratarErroAuth = (error) => {
     }
 };
 
+// Funções de Autenticação Exportadas
+
 export const loginEmail = async (email, senha) => {
     try {
         await signInWithEmailAndPassword(auth, email, senha);
