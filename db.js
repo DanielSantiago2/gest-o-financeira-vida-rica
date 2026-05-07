@@ -1,7 +1,7 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp, } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { 
     getFirestore, doc, setDoc, getDoc, collection, addDoc, 
-    deleteDoc, updateDoc, query, where, orderBy, getDocs 
+    deleteDoc, updateDoc, query, where, orderBy, getDocs, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Configurações de acesso ao seu projeto Firebase
@@ -81,3 +81,34 @@ export const criarQueryMetas = (userId) => {
  * Remove uma meta do banco.
  */
 export const deletarMetaDoc = (id) => deleteDoc(doc(db, "metas", id));
+
+/**
+ * Une dois usuários no mesmo grupo.
+ * @param {string} adminId - ID de quem está convidando.
+ * @param {string} convidadoEmail - E-mail de quem vai entrar no grupo.
+ */
+export const vincularParceiro = async (adminId, convidadoEmail) => {
+    // 1. Procurar o usuário pelo e-mail
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", convidadoEmail));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+        throw new Error("Usuário não encontrado. Peça para seu parceiro(a) criar uma conta primeiro!");
+    }
+
+    const parceiroDoc = querySnapshot.docs[0];
+    const parceiroId = parceiroDoc.id;
+    const groupId = `group_${adminId}`; // Criamos um ID único para o casal
+
+    // 2. Atualizar o documento de ambos com o mesmo groupId e mudar o modo para 'casal'
+    const batch = writeBatch(db); // Usamos batch para atualizar os dois ao mesmo tempo
+    const adminRef = doc(db, "users", adminId);
+    const parceiroRef = doc(db, "users", parceiroId);
+
+    batch.update(adminRef, { groupId: groupId, modo: "casal", plano: "premium" });
+    batch.update(parceiroRef, { groupId: groupId, modo: "casal", plano: "premium" });
+
+    await batch.commit();
+    return groupId;
+};

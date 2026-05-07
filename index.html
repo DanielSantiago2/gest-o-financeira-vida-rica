@@ -18,9 +18,10 @@
     <div id="container-sync-manual" style="display:none; margin-top: 10px;">
         <button id="btn-sync-manual" class="mini-btn">🔄 Atualizar Agora</button>
     </div>
-    <button id="btn-tema" class="mini-btn">🌙 / ☀️</button>
-    <button id="btn-sair" class="mini-btn danger">Sair</button>
-
+    <div style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
+        <button id="btn-tema" class="mini-btn">🌙 / ☀️</button>
+        <button id="btn-sair" class="mini-btn danger">Sair</button>
+    </div>
 </header>
 
 <section id="secao-login" class="box">
@@ -29,7 +30,7 @@
     
     <div style="position: relative; width: 100%;">
         <input type="password" id="senha" placeholder="Sua senha" style="padding-right: 40px;">
-        <button id="btn-ver-senha" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
+        <button id="btn-ver-senha" type="button" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
     </div>
 
     <p style="text-align: right; margin-top: 5px;">
@@ -40,7 +41,6 @@
     <button id="btn-cadastrar" class="secundario">Criar Conta</button>
     <div style="margin: 15px 0; text-align: center; color: #888;">ou</div>
     <button id="btn-google" class="google">Entrar com Google</button>
-    
 </section>
 
 <section id="secao-app" style="display:none;">
@@ -61,10 +61,25 @@
 
     <div class="box">
         <h3>👤 Perfil de Uso</h3>
-        <select id="select-modo">
-            <option value="solteiro">Modo Solteiro</option>
-            <option value="casal">Modo Casal (Premium)</option>
+        
+        <label for="select-modo" style="font-size: 0.8rem; color: #888;">Escolha o modo de exibição:</label>
+        <select id="select-modo" style="width: 100%; margin: 10px 0; padding: 10px; border-radius: 8px; background: var(--bg); color: white; border: 1px solid var(--borda);">
+            <option value="solteiro">👤 Modo Solteiro (Privado)</option>
+            <option value="casal">💑 Modo Casal (Compartilhado)</option>
         </select>
+
+        <p>Status: <strong id="txt-modo-atual">Carregando...</strong></p>
+        
+        <div id="area-convite" style="display:none; margin-top: 15px; border-top: 1px dashed #555; padding-top: 15px;">
+            <p><small>Para ativar o Modo Casal, convide seu parceiro(a):</small></p>
+            <input type="email" id="email-parceiro" placeholder="E-mail de parceiro(a) cadastrado">
+            <button id="btn-conectar-parceiro" class="mini-btn" style="width: 100%; margin-bottom: 10px;">🔗 Vincular no Sistema</button>
+            
+            <div class="grid2">
+                <button id="btn-convite-whatsapp" style="background: #25D366; color: white; border: none; padding: 10px; border-radius: 8px;">WhatsApp</button>
+                <button id="btn-convite-email" style="background: #ea4335; color: white; border: none; padding: 10px; border-radius: 8px;">E-mail</button>
+            </div>
+        </div>
     </div>
 
     <div class="grid2">
@@ -84,7 +99,7 @@
         <select id="categoria">
             <option value="Moradia">Moradia</option>
             <option value="Alimentação">Alimentação</option>
-            <option value="Assinatura">Assinatura (Netflix, etc)</option>
+            <option value="Assinatura">Assinatura</option>
             <option value="Lazer">Lazer</option>
             <option value="Outros">Outros</option>
         </select>
@@ -106,12 +121,8 @@
         <input type="text" id="meta-nome" placeholder="Ex: Reserva de Emergência">
         <input type="number" id="meta-objetivo" placeholder="Valor total (R$)">
         <button id="btn-salvar-meta" class="secundario">Criar Meta</button>
-        
-        <div id="lista-metas" style="margin-top: 15px;">
-            <!-- As metas aparecerão aqui -->
-        </div>
+        <div id="lista-metas" style="margin-top: 15px;"></div>
     </div>
-</div>
 
     <div class="box">
         <h3>📋 Histórico</h3>
@@ -119,7 +130,6 @@
     </div>
 </section>
 
-<!-- IMPORTANTE: O nome do arquivo aqui deve ser igual ao seu arquivo JS local -->
 <script type="module" src="script.js"></script>
 </body>
 </html>
