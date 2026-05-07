@@ -1,63 +1,42 @@
 import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword, 
-    signOut, 
-    GoogleAuthProvider, 
-    signInWithPopup,
-    sendPasswordResetEmail 
+    getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+    signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { app } from "./db.js";
 
 export const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Tratamento de erros amigável (Item 1)
 const tratarErroAuth = (error) => {
     switch (error.code) {
         case 'auth/invalid-credential': return "E-mail ou senha incorretos.";
-        case 'auth/user-not-found': return "Usuário não cadastrado.";
-        case 'auth/wrong-password': return "Senha incorreta.";
         case 'auth/email-already-in-use': return "Este e-mail já está em uso.";
-        case 'auth/network-request-failed': return "Erro de conexão. Verifique sua internet.";
-        default: return "Ocorreu um erro inesperado. Tente novamente.";
+        case 'auth/network-request-failed': return "Erro de conexão.";
+        default: return "Ocorreu um erro. Tente novamente.";
     }
 };
 
-// Funções de Autenticação Exportadas
-
 export const loginEmail = async (email, senha) => {
-    try {
-        await signInWithEmailAndPassword(auth, email, senha);
-    } catch (e) {
-        Swal.fire("Erro", tratarErroAuth(e), "error");
-    }
+    try { await signInWithEmailAndPassword(auth, email, senha); } 
+    catch (e) { Swal.fire("Erro", tratarErroAuth(e), "error"); }
 };
 
 export const criarConta = async (email, senha) => {
-    try {
-        await createUserWithEmailAndPassword(auth, email, senha);
-    } catch (e) {
-        Swal.fire("Erro", tratarErroAuth(e), "error");
-    }
+    try { await createUserWithEmailAndPassword(auth, email, senha); } 
+    catch (e) { Swal.fire("Erro", tratarErroAuth(e), "error"); }
 };
 
 export const loginGoogle = async () => {
-    try {
-        await signInWithPopup(auth, googleProvider);
-    } catch (e) {
-        Swal.fire("Erro", "Falha na autenticação com Google.", "error");
-    }
+    try { await signInWithPopup(auth, googleProvider); } 
+    catch (e) { Swal.fire("Erro", "Falha no login Google.", "error"); }
 };
 
 export const resetarSenha = async (email) => {
-    try {
+    if(!email) return Swal.fire("Atenção", "Digite seu e-mail", "warning");
+    try { 
         await sendPasswordResetEmail(auth, email);
-        Swal.fire("E-mail enviado", "Verifique sua caixa de entrada.", "success");
-    } catch (e) {
-        Swal.fire("Erro", "E-mail não encontrado.", "error");
-    }
+        Swal.fire("Sucesso", "E-mail de recuperação enviado!", "success");
+    } catch (e) { Swal.fire("Erro", "E-mail não encontrado.", "error"); }
 };
 
-// Função Sair (Item 5)
-export const deslogar = () => signOut(auth);
+export const deslogar = () => signOut(auth).then(() => location.reload());

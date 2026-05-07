@@ -1,225 +1,72 @@
-/* =====================================================
-💙 NÓS DOIS & EU - STYLE V2 (PRO)
-SaaS Ready | Escalável | Premium UI
-===================================================== */
+/* NÓS DOIS & EU - STYLE V2 (PRO) */
+*{ margin:0; padding:0; box-sizing:border-box; }
 
-/* =====================================================
-🔄 RESET
-===================================================== */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-/* =====================================================
-🎨 VARIÁVEIS (DARK DEFAULT)
-===================================================== */
 :root{
-  --bg:#0f172a;
-  --bg-soft:#020617;
-  --card:#1e293b;
-  --card2:#111827;
-  --texto:#ffffff;
-  --texto2:#cbd5e1;
-  --borda:#334155;
-  --azul:#2563eb;
-  --azul2:#1d4ed8;
-  --verde:#22c55e;
-  --vermelho:#ef4444;
-  --roxo:#7c3aed;
-  --amarelo:#f59e0b;
-  --premium:#facc15;
-  --sombra:0 10px 25px rgba(0,0,0,.25);
+  --bg:#0f172a; --bg-soft:#020617; --card:#1e293b; --card2:#111827;
+  --texto:#ffffff; --texto2:#cbd5e1; --borda:#334155; --azul:#2563eb;
+  --azul2:#1d4ed8; --verde:#22c55e; --vermelho:#ef4444; --roxo:#7c3aed;
+  --amarelo:#f59e0b; --premium:#facc15; --sombra:0 10px 25px rgba(0,0,0,.25);
 }
 
-/* =====================================================
-☀️ LIGHT MODE
-===================================================== */
 body.light{
-  --bg:#f8fafc;
-  --bg-soft:#e2e8f0;
-  --card:#ffffff;
-  --card2:#f1f5f9;
-  --texto:#0f172a;
-  --texto2:#475569;
-  --borda:#cbd5e1;
-  --sombra:0 8px 20px rgba(0,0,0,.08);
+  --bg:#f8fafc; --bg-soft:#e2e8f0; --card:#ffffff; --card2:#f1f5f9;
+  --texto:#0f172a; --texto2:#475569; --borda:#cbd5e1; --sombra:0 8px 20px rgba(0,0,0,.08);
 }
 
-/* =====================================================
-📱 BODY
-===================================================== */
 body{
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background:linear-gradient(180deg, var(--bg), var(--bg-soft));
-  color:var(--texto);
-  max-width:520px;
-  margin:auto;
-  padding:18px;
-  transition:.25s;
+  background: linear-gradient(180deg, var(--bg), var(--bg-soft));
+  color: var(--texto); max-width: 520px; margin: auto; padding: 18px; transition: .25s;
+  min-height: 100vh;
 }
 
-/* =====================================================
-🔝 TOPO
-===================================================== */
-.topo{
-  text-align:center;
-  margin-bottom:20px;
-}
-.topo h1{ font-size:26px; }
+.topo{ text-align: center; margin-bottom: 20px; }
+.topo h1{ font-size: 26px; }
 .topo small{
-  display:inline-block;
-  margin-top:6px;
-  padding:4px 10px;
-  border-radius:999px;
-  background:rgba(250,204,21,.15);
-  color:var(--premium);
-  font-weight:bold;
-  font-size:11px;
+  display: inline-block; margin-top: 6px; padding: 4px 10px; border-radius: 999px;
+  background: rgba(250,204,21,.15); color: var(--premium); font-weight: bold; font-size: 11px;
 }
 
-/* =====================================================
-📦 BOX
-===================================================== */
 .box{
-  background:var(--card);
-  padding:18px;
-  border-radius:18px;
-  margin-bottom:18px;
-  box-shadow:var(--sombra);
-  border:1px solid var(--borda);
+  background: var(--card); padding: 18px; border-radius: 18px; margin-bottom: 18px;
+  box-shadow: var(--sombra); border: 1px solid var(--borda);
 }
 
-/* =====================================================
-⌨ INPUTS
-===================================================== */
 input, select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:12px;
-  border:1px solid var(--borda);
-  background:var(--bg);
-  color:var(--texto);
+  width: 100%; padding: 12px; margin-top: 10px; border-radius: 12px;
+  border: 1px solid var(--borda); background: var(--bg); color: var(--texto);
 }
 
-/* =====================================================
-🔘 BOTÕES
-===================================================== */
 button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:12px;
-  font-weight:bold;
-  cursor:pointer;
-  background:linear-gradient(135deg, var(--azul), var(--azul2));
-  color:#fff;
-  transition:.2s;
-}
-button:hover{ transform:translateY(-2px); }
-button:active{ transform:scale(.98); }
-button:disabled{ opacity:.5; cursor:not-allowed; }
-
-/* VARIAÇÕES */
-.secundario{ background:var(--card2); }
-.danger{ background:var(--vermelho); }
-.google{ background:#fff; color:#000; border: 1px solid #ddd; }
-.mini-btn{ width:auto; padding:6px 12px; font-size:12px; }
-
-/* =====================================================
-📐 GRID
-===================================================== */
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+  width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 12px;
+  font-weight: bold; cursor: pointer; background: linear-gradient(135deg, var(--azul), var(--azul2));
+  color: #fff; transition: .2s;
 }
 
-/* =====================================================
-💰 SALDO
-===================================================== */
+button:hover{ transform: translateY(-2px); opacity: 0.9; }
+button:active{ transform: scale(.98); }
+.secundario{ background: var(--card2); }
+.danger{ background: var(--vermelho); }
+.google{ background: #fff; color: #000; border: 1px solid #ddd; }
+.mini-btn{ width: auto; padding: 6px 12px; font-size: 12px; margin-top: 5px;}
+
+.grid2{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
 .saldo-card{
-  background:linear-gradient(135deg, var(--azul), var(--azul2));
-  padding:18px;
-  border-radius:18px;
-  box-shadow:0 10px 20px rgba(37,99,235,.35);
+  background: linear-gradient(135deg, var(--azul), var(--azul2));
+  padding: 18px; border-radius: 18px; box-shadow: 0 10px 20px rgba(37,99,235,.35);
 }
-.secundario-card{
-  background:linear-gradient(135deg, var(--roxo), #6d28d9);
-}
+.secundario-card{ background: linear-gradient(135deg, var(--roxo), #6d28d9); }
 
-/* =====================================================
-📋 CARDS
-===================================================== */
 .card{
-  background:var(--card2);
-  padding:14px;
-  border-radius:14px;
-  margin-top:12px;
-  border-left:5px solid var(--borda);
+  background: var(--card2); padding: 14px; border-radius: 14px; margin-top: 12px;
+  border-left: 5px solid var(--borda);
 }
-.card.receita{ border-left-color:var(--verde); }
-.card.despesa{ border-left-color:var(--vermelho); }
-.card.assinatura{ border-left-color:var(--amarelo); }
+.card.receita{ border-left-color: var(--verde); }
+.card.despesa{ border-left-color: var(--vermelho); }
+.card.assinatura{ border-left-color: var(--amarelo); }
 
-/* =====================================================
-📊 GRÁFICO
-===================================================== */
-#meuGrafico{ max-height:280px; }
+.progresso-bg { background: var(--bg-soft); border-radius: 999px; height: 12px; width: 100%; margin: 10px 0; overflow: hidden; }
+.progresso-barra { background: linear-gradient(90deg, var(--verde), var(--azul)); height: 100%; transition: width 0.5s ease; }
 
-/* =====================================================
-🤖 ALERTAS IA
-===================================================== */
-.alerta{ border-left:5px solid var(--amarelo); background:rgba(245,158,11,.1); }
-.sucesso{ border-left:5px solid var(--verde); background:rgba(34,197,94,.1); }
-.perigo{ border-left:5px solid var(--vermelho); background:rgba(239,68,68,.1); }
-
-/* =====================================================
-💎 ADIÇÕES PARA FUNCIONALIDADES (OLHINHO E LINK)
-===================================================== */
-#btn-ver-senha:hover {
-    opacity: 0.7;
-}
-
-#btn-esqueci-senha:hover {
-    text-decoration: underline !important;
-    opacity: 0.8;
-}
-
-.google:hover {
-    background: #f1f1f1 !important;
-}
-
-/* =====================================================
-📱 RESPONSIVO
-===================================================== */
-@media(max-width:500px){
-  .grid2{ grid-template-columns:1fr; }
-  body{ padding:14px; }
-}
-
-/* Barra de Progresso das Metas */
-.progresso-bg {
-    background: var(--bg-soft);
-    border-radius: 999px;
-    height: 12px;
-    width: 100%;
-    margin: 10px 0;
-    overflow: hidden;
-}
-
-.progresso-barra {
-    background: linear-gradient(90deg, var(--verde), var(--azul));
-    height: 100%;
-    transition: width 0.5s ease-in-out;
-}
-
-.meta-item {
-    background: var(--card2);
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-}
+@media(max-width:500px){ .grid2{ grid-template-columns: 1fr; } }
