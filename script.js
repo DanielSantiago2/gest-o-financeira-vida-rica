@@ -149,23 +149,24 @@ async function carregarMetas(userId, saldo) {
     listaMetasDiv.innerHTML = html;
 }
 
-// Evento para salvar nova meta
-document.getElementById("btn-salvar-meta").onclick = async () => {
-    const nome = document.getElementById("meta-nome").value;
-    const valor = document.getElementById("meta-objetivo").value;
+// Usamos uma verificação de segurança para o botão
+const btnMeta = document.getElementById("btn-salvar-meta");
 
-    if (!nome || !valor) return Swal.fire("Atenção", "Informe o nome e o valor da meta!", "warning");
+if (btnMeta) {
+    btnMeta.onclick = async () => {
+        const nome = document.getElementById("meta-nome").value;
+        const valor = document.getElementById("meta-objetivo").value;
 
-    await salvarMeta(auth.currentUser.uid, nome, valor);
-    
-    // Limpeza e feedback
-    document.getElementById("meta-nome").value = "";
-    document.getElementById("meta-objetivo").value = "";
-    Swal.fire("Sucesso", "Meta registrada!", "success");
+        if (!nome || !valor) return Swal.fire("Atenção", "Preencha os campos!", "warning");
 
-    // Recarrega os dados para atualizar a barra de progresso com o saldo atual
-    carregarDados(criarQueryTransacoes(auth.currentUser.uid, usuarioDados.groupId));
-};
+        await salvarMeta(auth.currentUser.uid, nome, valor);
+        
+        document.getElementById("meta-nome").value = "";
+        document.getElementById("meta-objetivo").value = "";
+        
+        carregarDados(criarQueryTransacoes(auth.currentUser.uid, usuarioDados.groupId));
+    };
+}
 
 // Deletar meta
 window.excluirMeta = async (id) => {
