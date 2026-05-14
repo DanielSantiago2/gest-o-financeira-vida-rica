@@ -29,7 +29,7 @@ export const asaaswebhook = functions.onRequest({
         }
 
         // CORREÇÃO 2: Inicialização forçando a versão estável v1
-        const genAI = new GoogleGenerativeAI({ apiKey, apiVersion: "v1" } as any);
+        const genAI = new GoogleGenerativeAI({ apiKey, apiVersion: "v1" } as any); // Forçando atualização de segredos v5
         
         // CORREÇÃO 3: Uso do nome absoluto do modelo
         const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
