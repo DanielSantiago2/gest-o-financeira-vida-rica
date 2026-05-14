@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 
 admin.initializeApp();
 
-export const asaasWebhook = functions.https.onRequest(async (req, res) => {
+export const asaaswebhook = functions.https.onRequest(async (req, res) => {
   try {
     const data = req.body;
 
