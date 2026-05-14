@@ -7,7 +7,7 @@ export const asaaswebhook = functions.https.onRequest(async (req, res) => {
   try {
     const data = req.body;
 
-    console.log("Webhook recebido:", data);
+    console.log("webhook recebido:", data);
 
     if (data.event === "PAYMENT_CONFIRMED") {
       const userId = data.payment.externalReference;
