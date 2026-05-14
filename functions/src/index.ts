@@ -49,3 +49,5 @@ export const asaaswebhook = functions.onRequest({ secrets: ["GEMINI_KEY"] }, asy
         res.status(500).json({ dica: "IA temporariamente indisponível." });
     }
 });
+
+// Forçando atualização do deploy v2
