@@ -130,7 +130,7 @@ async function atualizarDicaComIA(dadosFinanceiros) {
     if (!painelDica) return;
 
     try {
-        const response = await fetch("https://asaaswebhook-xvab6uz5da-uc.a.run.app", {
+        const response = await fetch("https://us-central1-vida-rica-app-bc076.cloudfunctions.net/asaaswebhook", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(dadosFinanceiros)
