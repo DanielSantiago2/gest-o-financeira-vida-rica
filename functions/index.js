@@ -1,7 +1,7 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-exports.asaasWebhook = onRequest({ secrets: ["GEMINI_KEY"] }, async (req, res) => {
+exports.asaaswebhook = onRequest({ secrets: ["GEMINI_KEY"] }, async (req, res) => {
     // 1. Configura os cabeçalhos de CORS manualmente para qualquer origem
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
