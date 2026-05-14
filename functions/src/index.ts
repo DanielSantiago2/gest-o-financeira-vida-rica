@@ -17,10 +17,12 @@ export const asaaswebhook = functions.onRequest({ secrets: ["GEMINI_KEY"] }, asy
     }
 
     try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY || "");
-        // Vamos usar o gemini-1.5-flash sem o prefixo, mas garantindo a versão estável
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Mude a linha do GoogleGenerativeAI para incluir a versão da API:
+        const genAI = new GoogleGenerativeAI({ apiKey: process.env.GEMINI_KEY!, apiVersion: "v1" } as any);
 
+        // E na linha do modelo, use apenas o nome simples:
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
         const { modo, saldo, categorias } = req.body;
 
         // Se o corpo tiver o evento do Asaas, trata pagamento
