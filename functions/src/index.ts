@@ -32,7 +32,8 @@ export const asaaswebhook = functions.onRequest({
         // No topo do arquivo ou onde você inicializa o Gemini:
         const genAI = new GoogleGenerativeAI(apiKey); 
         // CORREÇÃO 3: Uso do nome absoluto do modelo
-        const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
+        // Remova o "models/" da frente:
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const { modo, saldo, categorias } = req.body;
 
