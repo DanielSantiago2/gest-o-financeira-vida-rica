@@ -18,7 +18,7 @@ export const asaaswebhook = functions.onRequest({ secrets: ["GEMINI_KEY"] }, asy
 
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY || "");
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" }); // Versão corrigida.
 
         const { modo, saldo, categorias } = req.body;
 
