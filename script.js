@@ -115,19 +115,25 @@ async function carregarDados(queryRef, isSnapshot = false) {
     atualizarGrafico(catMap);
     carregarMetas(auth.currentUser.uid, (totalR - totalD));
 
-    // --- ADIÇÃO DA IA: Dispara a análise sempre que os dados carregam ---
-    const resumoParaIA = {
-        modo: usuarioDados.modo || "solteiro",
-        saldo: (totalR - totalD).toFixed(2),
-        categorias: catMap
-    };
-    atualizarDicaComIA(resumoParaIA);
+    // --- DISPARA A IA COM PROTEÇÃO DE FLUXO ---
+    if (totalR > 0 || totalD > 0) {
+        const resumoParaIA = {
+            modo: usuarioDados.modo || "solteiro",
+            saldo: (totalR - totalD).toFixed(2),
+            categorias: catMap
+        };
+        atualizarDicaComIA(resumoParaIA);
+    }
 }
 
-// --- FUNÇÃO PARA CHAMAR A IA COM SEGURANÇA ---
+// --- FUNÇÃO PARA CHAMAR A IA COM SEGURANÇA E TRATAMENTO DE ERRO ---
 async function atualizarDicaComIA(dadosFinanceiros) {
     const painelDica = document.getElementById("dicas-financeiras");
     if (!painelDica) return;
+
+    // Trava para evitar múltiplas requisições simultâneas (Error 500 Prevent)
+    if (window.iaProcessando) return; 
+    window.iaProcessando = true;
 
     try {
         const response = await fetch("https://us-central1-vida-rica-app-bc076.cloudfunctions.net/asaaswebhook", {
@@ -136,11 +142,18 @@ async function atualizarDicaComIA(dadosFinanceiros) {
             body: JSON.stringify(dadosFinanceiros)
         });
 
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
         const data = await response.json();
         painelDica.innerText = data.dica || "Dica gerada com sucesso!";
     } catch (erro) {
         console.error("Erro na IA:", erro);
         painelDica.innerText = "IA em repouso. Continue focado nas metas!";
+    } finally {
+        // Libera para nova chamada após 5 segundos
+        setTimeout(() => { window.iaProcessando = false; }, 5000);
     }
 }
 
