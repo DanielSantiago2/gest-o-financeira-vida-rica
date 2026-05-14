@@ -16,9 +16,13 @@ export const atualizarGrafico = (dados) => {
             }]
         },
         options: {
+            animation: false, 
             responsive: true,
             plugins: {
-                legend: { position: 'bottom', labels: { color: isLight ? '#000' : '#fff' } }
+                legend: { 
+                    position: 'bottom', 
+                    labels: { color: isLight ? '#000' : '#fff' } 
+                }
             }
         }
     });

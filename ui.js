@@ -21,7 +21,13 @@ export const toggleBotaoLoading = (botaoId, isLoading, textoNormal) => {
 };
 
 export const atualizarDashboard = (receita, despesa) => {
+    const saldo = receita - despesa;
     document.getElementById("dinheiro").innerText = receita.toFixed(2);
     document.getElementById("contas").innerText = despesa.toFixed(2);
-    document.getElementById("falta").innerText = (receita - despesa).toFixed(2);
+    
+    const elFalta = document.getElementById("falta");
+    elFalta.innerText = saldo.toFixed(2);
+    
+    // Deixa o saldo verde se for positivo e vermelho se for negativo
+    elFalta.style.color = saldo >= 0 ? "var(--verde)" : "var(--vermelho)";
 };
