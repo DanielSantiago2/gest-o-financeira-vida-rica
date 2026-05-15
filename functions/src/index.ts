@@ -21,19 +21,14 @@ export const asaaswebhook = functions.onRequest({
 
     try {
         // CORREÇÃO 1: Validação da Chave antes de usar
-        const apiKey = process.env.GEMINI_KEY;
-        if (!apiKey) {
-            console.error("ERRO: GEMINI_KEY não encontrada no process.env");
-            res.status(500).json({ dica: "Erro de configuração de chave." });
-            return;
-        }
+       const apiKey = process.env.GEMINI_KEY;
+        // Forçamos a inicialização apontando para a v1 (estável) em vez da v1beta
+        const genAI = new GoogleGenerativeAI(apiKey || "");
 
-        // No topo do arquivo ou onde você inicializa o Gemini:
-        const genAI = new GoogleGenerativeAI(apiKey); 
-        // CORREÇÃO 3: Uso do nome absoluto do modelo
-        // Remova o "models/" da frente:
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+        // TESTE ESTA VARIAÇÃO:
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+        }, { apiVersion: 'v1' }); // <--- FORÇANDO A VERSÃO V1 AQUI
         const { modo, saldo, categorias } = req.body;
 
         // Log para debug (aparecerá no seu firebase functions:log)
