@@ -26,9 +26,7 @@ export const asaaswebhook = functions.onRequest({
         const genAI = new GoogleGenerativeAI(apiKey || "");
 
         // TESTE ESTA VARIAÇÃO:
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash",
-        }, { apiVersion: 'v1' }); // <--- FORÇANDO A VERSÃO V1 AQUI
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         const { modo, saldo, categorias } = req.body;
 
         // Log para debug (aparecerá no seu firebase functions:log)
