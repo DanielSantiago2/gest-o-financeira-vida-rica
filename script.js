@@ -27,37 +27,46 @@ window.atualizarCategorias = (tipo) => {
     });
 };
 
-// Lógica para o botão de nova categoria (+)
-document.getElementById("btn-nova-categoria").onclick = async () => {
-    const tipo = document.querySelector('input[name="tipo"]:checked').value;
-    
-    const { value: novaCat } = await Swal.fire({
-        title: 'Nova Categoria',
-        input: 'text',
-        inputLabel: `Nome da categoria de ${tipo === 'despesa' ? 'Gasto' : 'Ganho'}`,
-        showCancelButton: true,
-        confirmButtonText: 'Adicionar',
-        cancelButtonText: 'Cancelar'
-    });
+const btnNovaCat = document.getElementById("btn-nova-categoria");
+if (btnNovaCat) {
+    btnNovaCat.onclick = async () => {
+        const radioTipo = document.querySelector('input[name="tipo"]:checked');
+        const tipo = radioTipo ? radioTipo.value : 'despesa';
+        
+        const { value: novaCat } = await Swal.fire({
+            title: 'Nova Categoria',
+            input: 'text',
+            inputLabel: `Nome da categoria de ${tipo === 'despesa' ? 'Gasto' : 'Ganho'}`,
+            showCancelButton: true,
+            confirmButtonText: 'Adicionar',
+            cancelButtonText: 'Cancelar'
+        });
 
-    if (novaCat) {
-        const select = document.getElementById("categoria");
-        const opt = document.createElement("option");
-        opt.value = novaCat;
-        opt.innerText = novaCat;
-        select.appendChild(opt);
-        select.value = novaCat; 
-    }
-};
+        if (novaCat) {
+            const select = document.getElementById("categoria");
+            const opt = document.createElement("option");
+            opt.value = novaCat;
+            opt.innerText = novaCat;
+            select.appendChild(opt);
+            select.value = novaCat; 
+        }
+    };
+}
 
 onAuthStateChanged(auth, async (user) => {
+    const secaoLogin = document.getElementById("secao-login");
+    const secaoApp = document.getElementById("secao-app");
+
     if (!user) {
-        document.getElementById("secao-login").style.display = "block";
-        document.getElementById("secao-app").style.display = "none";
+        if (secaoLogin) secaoLogin.style.display = "block";
+        if (secaoApp) secaoApp.style.display = "none";
         if (unsubscribe) unsubscribe();
         return;
     }
     
+    if (secaoLogin) secaoLogin.style.display = "none";
+    if (secaoApp) secaoApp.style.display = "block";
+
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
     
@@ -77,9 +86,11 @@ function initDataFlow(user) {
     const idGrupoBusca = usuarioDados.modo === "casal" ? usuarioDados.groupId : null;
     const q = criarQueryTransacoes(user.uid, idGrupoBusca);
 
+    const btnSync = document.getElementById("btn-sync-manual");
+
     if (usuarioDados.plano === "free") {
         carregarDados(q);
-        document.getElementById("btn-sync-manual").onclick = () => carregarDados(q);
+        if (btnSync) btnSync.onclick = () => carregarDados(q);
     } else {
         if (unsubscribe) unsubscribe();
         unsubscribe = onSnapshot(q, (snapshot) => carregarDados(snapshot, true));
@@ -93,9 +104,11 @@ async function carregarDados(queryRef, isSnapshot = false) {
 
     snap.forEach(docSnap => {
         const d = docSnap.data();
-        const v = parseFloat(d.valor);
+        const v = parseFloat(d.valor) || 0;
         v > 0 ? totalR += v : totalD += Math.abs(v);
-        catMap[d.categoria] = (catMap[d.categoria] || 0) + Math.abs(v);
+        
+        const catNome = d.categoria || "Outros";
+        catMap[catNome] = (catMap[catNome] || 0) + Math.abs(v);
 
         html += `
             <div class="card ${v < 0 ? 'despesa' : 'receita'}">
@@ -111,9 +124,14 @@ async function carregarDados(queryRef, isSnapshot = false) {
     });
 
     atualizarDashboard(totalR, totalD);
-    document.getElementById("lista").innerHTML = html || "Vazio";
+    const listaElem = document.getElementById("lista");
+    if (listaElem) listaElem.innerHTML = html || "Vazio";
+    
     atualizarGrafico(catMap);
-    carregarMetas(auth.currentUser.uid, (totalR - totalD));
+    
+    if (auth.currentUser) {
+        carregarMetas(auth.currentUser.uid, (totalR - totalD));
+    }
 
     // --- DISPARA A IA COM PROTEÇÃO DE FLUXO ---
     if (totalR > 0 || totalD > 0) {
@@ -126,12 +144,10 @@ async function carregarDados(queryRef, isSnapshot = false) {
     }
 }
 
-// --- FUNÇÃO PARA CHAMAR A IA COM SEGURANÇA E TRATAMENTO DE ERRO ---
 async function atualizarDicaComIA(dadosFinanceiros) {
     const painelDica = document.getElementById("dicas-financeiras");
     if (!painelDica) return;
 
-    // Trava para evitar múltiplas requisições simultâneas (Error 500 Prevent)
     if (window.iaProcessando) return; 
     window.iaProcessando = true;
 
@@ -142,30 +158,29 @@ async function atualizarDicaComIA(dadosFinanceiros) {
             body: JSON.stringify(dadosFinanceiros)
         });
 
-        if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
 
         const data = await response.json();
-        painelDica.innerText = data.dica || "Dica gerada com sucesso!";
+        painelDica.innerText = data.dica || "Mantenha o foco!";
     } catch (erro) {
-        console.error("Erro na IA:", erro);
+        console.warn("IA indisponível:", erro.message);
         painelDica.innerText = "IA em repouso. Continue focado nas metas!";
     } finally {
-        // Libera para nova chamada após 5 segundos
-        setTimeout(() => { window.iaProcessando = false; }, 5000);
+        setTimeout(() => { window.iaProcessando = false; }, 8000); // Aumentado para 8s para evitar flood
     }
 }
 
 async function carregarMetas(uid, saldo) {
+    const listaMetas = document.getElementById("lista-metas");
+    if (!listaMetas) return;
+
     const snap = await getDocs(criarQueryMetas(uid));
     let html = "";
     snap.forEach(docSnap => {
         const m = docSnap.data();
-        let p = Math.min(100, Math.max(0, (saldo / m.objetivo) * 100));
-        const valorObjetivo = parseFloat(m.objetivo).toFixed(2);
-        const valorAtual = saldo.toFixed(2);
-
+        const obj = parseFloat(m.objetivo) || 1; // Evita divisão por zero
+        let p = Math.min(100, Math.max(0, (saldo / obj) * 100));
+        
         html += `
             <div class="meta-item" style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #333;">
                 <div style="display:flex; justify-content: space-between; align-items: center">
@@ -173,7 +188,7 @@ async function carregarMetas(uid, saldo) {
                     <span style="font-size: 0.8rem; color: #888;">${p.toFixed(0)}%</span>
                 </div>
                 <div style="font-size: 0.85rem; color: var(--text-sec); margin: 5px 0;">
-                    R$ ${valorAtual} de R$ ${valorObjetivo}
+                    R$ ${saldo.toFixed(2)} de R$ ${obj.toFixed(2)}
                 </div>
                 <div style="display:flex; align-items: center; gap: 10px;">
                     <div class="progresso-bg" style="flex-grow: 1; height: 10px; background: #222; border-radius: 5px; overflow: hidden;">
@@ -183,7 +198,7 @@ async function carregarMetas(uid, saldo) {
                 </div>
             </div>`;
     });
-    document.getElementById("lista-metas").innerHTML = html;
+    listaMetas.innerHTML = html;
 }
 
 const selectModo = document.getElementById("select-modo");
@@ -194,113 +209,144 @@ if (selectModo) {
         try {
             toggleBotaoLoading("select-modo", true, ""); 
             await updateDoc(userRef, { modo: novoModo });
-            Swal.fire("Modo Alterado", `Agora você está no modo ${novoModo === 'casal' ? 'Casal' : 'Solteiro'}`, "success")
-                .then(() => location.reload()); 
+            await Swal.fire("Modo Alterado", `Agora você está no modo ${novoModo === 'casal' ? 'Casal' : 'Solteiro'}`, "success");
+            location.reload(); 
         } catch (e) {
             Swal.fire("Erro", "Não foi possível mudar o modo", "error");
         }
     };
 }
 
-document.getElementById("btn-salvar").onclick = async () => {
-    const desc = document.getElementById("desc").value;
-    const valor = document.getElementById("valor").value;
-    const tipo = document.querySelector('input[name="tipo"]:checked').value;
-    const numParcelas = parseInt(document.getElementById("parcelas").value) || 1; 
-    const dataInicial = document.getElementById("vencimento").value ? new Date(document.getElementById("vencimento").value) : new Date();
+const btnSalvar = document.getElementById("btn-salvar");
+if (btnSalvar) {
+    btnSalvar.onclick = async () => {
+        const desc = document.getElementById("desc").value;
+        const valor = document.getElementById("valor").value;
+        const radioTipo = document.querySelector('input[name="tipo"]:checked');
+        const tipo = radioTipo ? radioTipo.value : 'despesa';
+        const numParcelas = parseInt(document.getElementById("parcelas").value) || 1; 
+        const vencElem = document.getElementById("vencimento").value;
+        const dataInicial = vencElem ? new Date(vencElem) : new Date();
 
-    if (!desc || !valor) return;
-    const gid = usuarioDados.modo === "casal" ? usuarioDados.groupId : null;
+        if (!desc || !valor) {
+            Swal.fire("Ops", "Preencha descrição e valor", "warning");
+            return;
+        }
 
-    toggleBotaoLoading("btn-salvar", true, "Salvando...");
+        const gid = usuarioDados.modo === "casal" ? usuarioDados.groupId : null;
+        toggleBotaoLoading("btn-salvar", true, "Salvando...");
 
-    for (let i = 0; i < numParcelas; i++) {
-        const dataParcela = new Date(dataInicial);
-        dataParcela.setMonth(dataParcela.getMonth() + i); 
+        try {
+            for (let i = 0; i < numParcelas; i++) {
+                const dataParcela = new Date(dataInicial);
+                dataParcela.setMonth(dataParcela.getMonth() + i); 
 
-        await salvarTransacao(auth.currentUser.uid, gid, {
-            desc: numParcelas > 1 ? `${desc} (${i + 1}/${numParcelas})` : desc,
-            valor: Number(valor),
-            tipo,
-            categoria: document.getElementById("categoria").value,
-            data: dataParcela.toISOString().split('T')[0],
-            pago: false
-        });
-    }
-
-    Swal.fire("Sucesso", `${numParcelas} lançamento(s) realizados!`, "success")
-        .then(() => location.reload());
-};
+                await salvarTransacao(auth.currentUser.uid, gid, {
+                    desc: numParcelas > 1 ? `${desc} (${i + 1}/${numParcelas})` : desc,
+                    valor: Number(valor),
+                    tipo,
+                    categoria: document.getElementById("categoria").value,
+                    data: dataParcela.toISOString().split('T')[0],
+                    pago: false
+                });
+            }
+            await Swal.fire("Sucesso", `${numParcelas} lançamento(s) realizados!`, "success");
+            location.reload();
+        } catch (e) {
+            console.error(e);
+            toggleBotaoLoading("btn-salvar", false, "Salvar");
+        }
+    };
+}
 
 window.excluirTransacao = async (id) => { if(confirm("Excluir?")) { await deletarDoc(id); location.reload(); }};
 window.alterarStatus = async (id, s) => { await atualizarStatusDoc(id, s); location.reload(); };
 window.excluirMeta = async (id) => { await deletarMetaDoc(id); location.reload(); };
 
-document.getElementById("btn-salvar-meta").onclick = async () => {
-    const n = document.getElementById("meta-nome").value;
-    const v = document.getElementById("meta-objetivo").value;
-    if(n && v) { await salvarMeta(auth.currentUser.uid, n, v); location.reload(); }
+const btnSalvarMeta = document.getElementById("btn-salvar-meta");
+if (btnSalvarMeta) {
+    btnSalvarMeta.onclick = async () => {
+        const n = document.getElementById("meta-nome").value;
+        const v = document.getElementById("meta-objetivo").value;
+        if(n && v) { 
+            await salvarMeta(auth.currentUser.uid, n, v); 
+            location.reload(); 
+        }
+    };
+}
+
+// --- EVENTOS DE BOTÕES AUXILIARES ---
+const addEvent = (id, event, fn) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener(event, fn);
 };
 
-document.getElementById("btn-tema").onclick = () => document.body.classList.toggle("light");
-document.getElementById("btn-sair").onclick = deslogar;
-document.getElementById("btn-login").onclick = () => loginEmail(document.getElementById("email").value, document.getElementById("senha").value);
-document.getElementById("btn-cadastrar").onclick = () => criarConta(document.getElementById("email").value, document.getElementById("senha").value);
-document.getElementById("btn-google").onclick = loginGoogle;
-document.getElementById("btn-conectar-parceiro").onclick = async () => {
+addEvent("btn-tema", "click", () => document.body.classList.toggle("light"));
+addEvent("btn-sair", "click", deslogar);
+addEvent("btn-login", "click", () => loginEmail(document.getElementById("email").value, document.getElementById("senha").value));
+addEvent("btn-cadastrar", "click", () => criarConta(document.getElementById("email").value, document.getElementById("senha").value));
+addEvent("btn-google", "click", loginGoogle);
+
+addEvent("btn-conectar-parceiro", "click", async () => {
+    const emailParceiro = document.getElementById("email-parceiro").value;
     try {
-        await vincularParceiro(auth.currentUser.uid, document.getElementById("email-parceiro").value);
-        Swal.fire("Sucesso", "Conectados!", "success").then(() => location.reload());
-    } catch(e) { Swal.fire("Erro", e.message, "error"); }
-};
+        await vincularParceiro(auth.currentUser.uid, emailParceiro);
+        await Swal.fire("Sucesso", "Conectados!", "success");
+        location.reload();
+    } catch(e) { 
+        Swal.fire("Erro", e.message, "error"); 
+    }
+});
 
-document.getElementById("btn-pdf").onclick = () => {
+addEvent("btn-pdf", "click", () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const docPdf = new jsPDF();
     const canvas = document.getElementById("meuGrafico");
 
-    doc.setFontSize(20);
-    doc.setTextColor(37, 99, 235);
-    doc.text("Relatório Nós Dois & Eu", 20, 20);
+    docPdf.setFontSize(20);
+    docPdf.setTextColor(37, 99, 235);
+    docPdf.text("Relatório Nós Dois & Eu", 20, 20);
     
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Gerado por: ${usuarioDados.email}`, 20, 30);
-    doc.text(`Data: ${new Date().toLocaleDateString()} | Modo: ${usuarioDados.modo}`, 20, 35);
+    docPdf.setFontSize(10);
+    docPdf.setTextColor(100);
+    docPdf.text(`Gerado por: ${usuarioDados.email || 'Usuário'}`, 20, 30);
+    docPdf.text(`Data: ${new Date().toLocaleDateString()} | Modo: ${usuarioDados.modo}`, 20, 35);
 
-    const receitas = document.getElementById("dinheiro").innerText;
-    const despesas = document.getElementById("contas").innerText;
-    const saldo = document.getElementById("falta").innerText;
+    const receitas = document.getElementById("dinheiro")?.innerText || "0,00";
+    const despesas = document.getElementById("contas")?.innerText || "0,00";
+    const saldo = document.getElementById("falta")?.innerText || "0,00";
 
-    doc.setDrawColor(200);
-    doc.line(20, 42, 190, 42);
-    doc.setFontSize(12);
-    doc.setTextColor(0);
-    doc.text(`Receitas: R$ ${receitas}`, 20, 52);
-    doc.text(`Despesas: R$ ${despesas}`, 20, 60);
-    doc.text(`Saldo Líquido: R$ ${saldo}`, 20, 68);
+    docPdf.setDrawColor(200);
+    docPdf.line(20, 42, 190, 42);
+    docPdf.setFontSize(12);
+    docPdf.setTextColor(0);
+    docPdf.text(`Receitas: R$ ${receitas}`, 20, 52);
+    docPdf.text(`Despesas: R$ ${despesas}`, 20, 60);
+    docPdf.text(`Saldo Líquido: R$ ${saldo}`, 20, 68);
 
-    try {
-        const graficoImagem = canvas.toDataURL("image/jpeg", 1.0); 
-        doc.text("Distribuição por Categorias:", 20, 80);
-        doc.addImage(graficoImagem, 'JPEG', 55, 85, 90, 90); 
-    } catch (e) {
-        doc.setTextColor(200, 0, 0);
-        doc.text("Gráfico indisponível no momento", 20, 85);
+    if (canvas) {
+        try {
+            const graficoImagem = canvas.toDataURL("image/jpeg", 1.0); 
+            docPdf.text("Distribuição por Categorias:", 20, 80);
+            docPdf.addImage(graficoImagem, 'JPEG', 55, 85, 90, 90); 
+        } catch (e) {
+            docPdf.setTextColor(200, 0, 0);
+            docPdf.text("Gráfico indisponível no momento", 20, 85);
+        }
     }
 
     let y = 190; 
-    doc.setTextColor(0);
-    doc.text("Histórico de Transações:", 20, 185);
+    docPdf.setTextColor(0);
+    docPdf.text("Histórico de Transações:", 20, 185);
     
     const transacoes = document.querySelectorAll("#lista .card");
     transacoes.forEach((card, i) => {
-        if (y > 275) { doc.addPage(); y = 20; }
+        if (y > 275) { docPdf.addPage(); y = 20; }
         const info = card.innerText.split('\n')[0].trim();
-        doc.setFontSize(9);
-        doc.text(`${i + 1}. ${info}`, 20, y);
+        docPdf.setFontSize(9);
+        docPdf.text(`${i + 1}. ${info}`, 20, y);
         y += 8;
     });
 
-    doc.save(`Relatorio_VidaRica_${new Date().toLocaleDateString()}.pdf`);
-};
+    docPdf.save(`Relatorio_VidaRica_${new Date().toLocaleDateString()}.pdf`);
+});
